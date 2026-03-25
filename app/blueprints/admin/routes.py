@@ -74,18 +74,14 @@ def dashboard():
     if 'user_type' not in session or session['user_type'] != 'admin':
         return redirect(url_for('auth.login'))
 
-    conn = psycopg2.connect(**Config.DB_CONFIG)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT user_id, full_name, address, email, status, user_type, gst_no, company_name, pincode, phone_number, distributor_code
-        FROM user_signups
-        WHERE (user_type = 'dealer' OR user_type = 'distributor') AND status = 'Pending'
-    """)
-    users = cur.fetchall()
-
-    cur.close()
-    conn.close()
+    with psycopg2.connect(**Config.DB_CONFIG) as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT user_id, full_name, address, email, status, user_type, gst_no, company_name, pincode, phone_number, distributor_code
+                FROM user_signups
+                WHERE user_type IN ('dealer', 'distributor') AND status = 'Pending'
+            """)
+            users = cur.fetchall()
 
     return render_template("admin/dashboard.html", users=users)
 
@@ -224,22 +220,21 @@ def edit_user(user_id):
         conn = psycopg2.connect(**Config.DB_CONFIG)
         cursor = conn.cursor()
 
+        # Check user exists and email not taken — single query
         cursor.execute("""
-            SELECT user_id FROM user_signups
-            WHERE email = %s AND user_id != %s
-        """, (data['email'], user_id))
-
-        if cursor.fetchone():
-            cursor.close()
-            conn.close()
-            return jsonify({"status": "error", "message": "Email already exists"}), 400
-
-        # Check if user exists
-        cursor.execute("SELECT user_id FROM user_signups WHERE user_id = %s", (user_id,))
-        if not cursor.fetchone():
+            SELECT
+                EXISTS(SELECT 1 FROM user_signups WHERE user_id = %s) AS user_exists,
+                EXISTS(SELECT 1 FROM user_signups WHERE email = %s AND user_id != %s) AS email_taken
+        """, (user_id, data['email'], user_id))
+        row = cursor.fetchone()
+        if not row[0]:
             cursor.close()
             conn.close()
             return jsonify({"status": "error", "message": "User not found"}), 404
+        if row[1]:
+            cursor.close()
+            conn.close()
+            return jsonify({"status": "error", "message": "Email already exists"}), 400
 
         cursor.execute("""
             UPDATE user_signups
@@ -459,31 +454,17 @@ def create_user():
             conn = psycopg2.connect(**Config.DB_CONFIG)
             cursor = conn.cursor()
 
-            # Duplicate Check: Email
+            # Duplicate Check: Email and Phone in single query
             cursor.execute(
-                "SELECT user_id FROM user_signups WHERE LOWER(email) = LOWER(%s)",
-                (email,)
+                "SELECT LOWER(email) = LOWER(%s) AS email_match, phone_number = %s AS phone_match FROM user_signups WHERE LOWER(email) = LOWER(%s) OR phone_number = %s LIMIT 1",
+                (email, phone_number, email, phone_number)
             )
-            if cursor.fetchone():
+            dup = cursor.fetchone()
+            if dup:
                 cursor.close()
                 conn.close()
-                return jsonify({
-                    "status": "error",
-                    "message": "Email already registered"
-                }), 400
-
-            # Duplicate Check: Phone Number
-            cursor.execute(
-                "SELECT user_id FROM user_signups WHERE phone_number = %s",
-                (phone_number,)
-            )
-            if cursor.fetchone():
-                cursor.close()
-                conn.close()
-                return jsonify({
-                    "status": "error",
-                    "message": "Phone number already registered"
-                }), 400
+                msg = "Email already registered" if dup[0] else "Phone number already registered"
+                return jsonify({"status": "error", "message": msg}), 400
 
             # Generate codes based on user type
             dealer_code = None
@@ -872,12 +853,10 @@ def regenerate_code(user_type, user_id):
                     }), 500
 
                 # Update database
-                code_column = 'dealer_code' if user_type == 'dealer' else 'distributor_code'
-                cur.execute(f"""
-                    UPDATE user_signups
-                    SET {code_column} = %s, code_rotated_at = NOW()
-                    WHERE user_id = %s
-                """, (new_code, user_id))
+                if user_type == 'dealer':
+                    cur.execute("UPDATE user_signups SET dealer_code = %s, code_rotated_at = NOW() WHERE user_id = %s", (new_code, user_id))
+                else:
+                    cur.execute("UPDATE user_signups SET distributor_code = %s, code_rotated_at = NOW() WHERE user_id = %s", (new_code, user_id))
                 conn.commit()
 
                 return jsonify({

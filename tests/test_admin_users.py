@@ -124,8 +124,8 @@ class TestCreateUser:
 
     def test_create_user_duplicate_email(self, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
-        # First query (email check) returns a row → duplicate
-        mock_cursor.fetchone.side_effect = [(1,)]
+        # Combined duplicate check returns (email_match=True, phone_match=False)
+        mock_cursor.fetchone.side_effect = [(True, False)]
 
         resp = admin_session.post("/admin/users", json=self.VALID_DEALER_DATA)
         assert resp.status_code == 400
@@ -133,8 +133,8 @@ class TestCreateUser:
 
     def test_create_user_duplicate_phone(self, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
-        # First query (email check) → no match; second query (phone check) → match
-        mock_cursor.fetchone.side_effect = [None, (1,)]
+        # Combined duplicate check returns (email_match=False, phone_match=True)
+        mock_cursor.fetchone.side_effect = [(False, True)]
 
         resp = admin_session.post("/admin/users", json=self.VALID_DEALER_DATA)
         assert resp.status_code == 400
@@ -145,10 +145,9 @@ class TestCreateUser:
     @patch("app.blueprints.admin.routes.get_unique_code", return_value="12345")
     def test_create_dealer_success(self, mock_code, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
-        # email check → None, phone check → None, INSERT RETURNING → row
+        # combined dup check → no match, INSERT RETURNING → row
         mock_cursor.fetchone.side_effect = [
-            None,   # email not taken
-            None,   # phone not taken
+            None,   # no duplicate found
             (99, "John Dealer", "123 Main St", "john@dealer.com", "dealer", "12345", ""),
         ]
 
@@ -166,8 +165,7 @@ class TestCreateUser:
     def test_create_distributor_success(self, mock_code, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
         mock_cursor.fetchone.side_effect = [
-            None,
-            None,
+            None,   # no duplicate
             (100, "Jane Distributor", "456 Oak Ave", "jane@distributor.com", "distributor", "", "67890"),
         ]
 
@@ -184,7 +182,7 @@ class TestCreateUser:
         """Admin-created users should have status 'Approved'."""
         mock_conn, mock_cursor = mock_db
         mock_cursor.fetchone.side_effect = [
-            None, None,
+            None,   # no duplicate
             (101, "Auto User", "addr", "auto@test.com", "dealer", "11111", ""),
         ]
 
@@ -240,8 +238,8 @@ class TestEditUser:
 
     def test_edit_user_duplicate_email(self, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
-        # Email uniqueness check returns existing row
-        mock_cursor.fetchone.return_value = (2,)
+        # Combined query returns (user_exists=True, email_taken=True)
+        mock_cursor.fetchone.return_value = (True, True)
 
         resp = admin_session.put("/admin/users/10", json=self.VALID_EDIT_DATA)
         assert resp.status_code == 400
@@ -251,8 +249,8 @@ class TestEditUser:
 
     def test_edit_user_success(self, admin_session, mock_db):
         mock_conn, mock_cursor = mock_db
-        # Email check → no duplicate, user exists check → found
-        mock_cursor.fetchone.side_effect = [None, (10,)]
+        # Combined query: user exists, email not taken
+        mock_cursor.fetchone.return_value = (True, False)
 
         resp = admin_session.put("/admin/users/10", json=self.VALID_EDIT_DATA)
         assert resp.status_code == 200
@@ -265,8 +263,8 @@ class TestEditUser:
     def test_edit_user_not_found(self, admin_session, mock_db):
         """Editing a non-existent user should return 404."""
         mock_conn, mock_cursor = mock_db
-        # Email check → no duplicate, user exists check → not found
-        mock_cursor.fetchone.side_effect = [None, None]
+        # Combined query: user does not exist
+        mock_cursor.fetchone.return_value = (False, False)
 
         resp = admin_session.put("/admin/users/999", json=self.VALID_EDIT_DATA)
         assert resp.status_code == 404
@@ -275,12 +273,12 @@ class TestEditUser:
     def test_edit_user_updates_correct_fields(self, admin_session, mock_db):
         """Verify the UPDATE query receives the right values."""
         mock_conn, mock_cursor = mock_db
-        mock_cursor.fetchone.side_effect = [None, (10,)]
+        mock_cursor.fetchone.return_value = (True, False)
 
         admin_session.put("/admin/users/10", json=self.VALID_EDIT_DATA)
 
-        # The third execute call is the UPDATE (1: email check, 2: user exists, 3: update)
-        update_call = mock_cursor.execute.call_args_list[2]
+        # The second execute call is the UPDATE (1: combined check, 2: update)
+        update_call = mock_cursor.execute.call_args_list[1]
         sql = update_call[0][0]
         params = update_call[0][1]
 
@@ -292,7 +290,7 @@ class TestEditUser:
     def test_edit_user_with_optional_fields_empty(self, admin_session, mock_db):
         """gst_no, pincode, distributor_code, dealer_code can be empty."""
         mock_conn, mock_cursor = mock_db
-        mock_cursor.fetchone.side_effect = [None, (10,)]
+        mock_cursor.fetchone.return_value = (True, False)
 
         data = {**self.VALID_EDIT_DATA, "gst_no": "", "pincode": "", "distributor_code": "", "dealer_code": ""}
         resp = admin_session.put("/admin/users/10", json=data)
@@ -301,12 +299,12 @@ class TestEditUser:
     def test_edit_user_preserves_dealer_code(self, admin_session, mock_db):
         """Ensure dealer_code is passed through to the UPDATE."""
         mock_conn, mock_cursor = mock_db
-        mock_cursor.fetchone.side_effect = [None, (10,)]
+        mock_cursor.fetchone.return_value = (True, False)
 
         data = {**self.VALID_EDIT_DATA, "dealer_code": "55555"}
         admin_session.put("/admin/users/10", json=data)
 
-        update_call = mock_cursor.execute.call_args_list[2]
+        update_call = mock_cursor.execute.call_args_list[1]
         params = update_call[0][1]
         assert "55555" in params
 

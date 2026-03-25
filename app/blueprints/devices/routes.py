@@ -185,74 +185,46 @@ def _extract_first_ip(ip_dict_or_value) -> Optional[str]:
 
 def write_status_to_db(info: dict, status: str):
     hostname = info.get("Hostname")
+    machine_val = (info.get("Machine (OS Type)") or info.get("Machine") or info.get("Machine Type"))
 
-    conn = psycopg2.connect(**Config.DB_CONFIG)
-    cur = conn.cursor()
-
-    cur.execute(
-        "SELECT 1 FROM system_information WHERE hostname=%s",
-        (hostname,)
-    )
-    exists = cur.fetchone()
-
-    if not exists:
-        cur.execute("""
-            INSERT INTO system_information (
-                hostname, os, os_version, kernel_version,
-                make, model, serial_number, processor,
-                machine_type, mac_addresses, ip_address,
-                status, created_at
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())
-        """, (
-            hostname,
-            info.get("OS"),
-            info.get("OS Version"),
-            info.get("Kernel Version"),
-            info.get("Make"),
-            info.get("Model"),
-            info.get("Serial Number"),
-            info.get("Processor"),
-            (info.get("Machine (OS Type)") or info.get("Machine") or info.get("Machine Type")),
-            Json(info.get("MAC Addresses")),
-            Json(info.get("IP Address")),
-            status
-        ))
-    else:
-        machine_val = (info.get("Machine (OS Type)") or info.get("Machine") or info.get("Machine Type"))
-        cur.execute("""
-            UPDATE system_information
-            SET
-                status=%s,
-                os = COALESCE(NULLIF(os,''), %s),
-                os_version = COALESCE(NULLIF(os_version,''), %s),
-                kernel_version = COALESCE(NULLIF(kernel_version,''), %s),
-                make = COALESCE(NULLIF(make,''), %s),
-                model = COALESCE(NULLIF(model,''), %s),
-                serial_number = COALESCE(NULLIF(serial_number,''), %s),
-                processor = COALESCE(NULLIF(processor,''), %s),
-                machine_type = COALESCE(NULLIF(machine_type,''), %s),
-                mac_addresses = COALESCE(mac_addresses, %s),
-                ip_address = %s
-            WHERE hostname=%s
-        """, (
-            status,
-            info.get("OS"),
-            info.get("OS Version"),
-            info.get("Kernel Version"),
-            info.get("Make"),
-            info.get("Model"),
-            info.get("Serial Number"),
-            info.get("Processor"),
-            machine_val,
-            Json(info.get("MAC Addresses")),
-            Json(info.get("IP Address")),
-            hostname
-        ))
-
-    conn.commit()
-    cur.close()
-    conn.close()
+    with psycopg2.connect(**Config.DB_CONFIG) as conn:
+        with conn.cursor() as cur:
+            # Upsert: INSERT on conflict UPDATE
+            cur.execute("""
+                INSERT INTO system_information (
+                    hostname, os, os_version, kernel_version,
+                    make, model, serial_number, processor,
+                    machine_type, mac_addresses, ip_address,
+                    status, created_at
+                )
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())
+                ON CONFLICT (hostname) DO UPDATE SET
+                    status = EXCLUDED.status,
+                    os = COALESCE(NULLIF(system_information.os,''), EXCLUDED.os),
+                    os_version = COALESCE(NULLIF(system_information.os_version,''), EXCLUDED.os_version),
+                    kernel_version = COALESCE(NULLIF(system_information.kernel_version,''), EXCLUDED.kernel_version),
+                    make = COALESCE(NULLIF(system_information.make,''), EXCLUDED.make),
+                    model = COALESCE(NULLIF(system_information.model,''), EXCLUDED.model),
+                    serial_number = COALESCE(NULLIF(system_information.serial_number,''), EXCLUDED.serial_number),
+                    processor = COALESCE(NULLIF(system_information.processor,''), EXCLUDED.processor),
+                    machine_type = COALESCE(NULLIF(system_information.machine_type,''), EXCLUDED.machine_type),
+                    mac_addresses = COALESCE(system_information.mac_addresses, EXCLUDED.mac_addresses),
+                    ip_address = EXCLUDED.ip_address
+            """, (
+                hostname,
+                info.get("OS"),
+                info.get("OS Version"),
+                info.get("Kernel Version"),
+                info.get("Make"),
+                info.get("Model"),
+                info.get("Serial Number"),
+                info.get("Processor"),
+                machine_val,
+                Json(info.get("MAC Addresses")),
+                Json(info.get("IP Address")),
+                status
+            ))
+        conn.commit()
 
 
 def update_device_status(info: dict, sys_status: str):
@@ -265,61 +237,51 @@ def update_device_status(info: dict, sys_status: str):
     if not ip_address:
         return
 
-    conn = psycopg2.connect(**Config.DB_CONFIG)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT status, online_at, offline_at
-        FROM device_status
-        WHERE hostname=%s
-        ORDER BY last_change_at DESC
-        LIMIT 1
-    """, (hostname,))
-    row = cur.fetchone()
-
     now = datetime.now()
 
-    if row is None:
-        if new_status == "ONLINE":
+    with psycopg2.connect(**Config.DB_CONFIG) as conn:
+        with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO device_status
-                (ip_address, hostname, status, online_at, last_change_at)
-                VALUES (%s,%s,'ONLINE',%s,NOW())
-            """, (ip_address, hostname, now))
-        else:
-            cur.execute("""
-                INSERT INTO device_status
-                (ip_address, hostname, status, offline_at, last_change_at)
-                VALUES (%s,%s,'OFFLINE',%s,NOW())
-            """, (ip_address, hostname, now))
-    else:
-        last_status, online_at, offline_at = row
-
-        if last_status != new_status:
-            if new_status == "ONLINE":
-                offline_seconds = int((now - offline_at).total_seconds()) if offline_at else 0
-                cur.execute("""
-                    UPDATE device_status
-                    SET ip_address=%s, status='ONLINE', online_at=%s,
-                        offline_duration_seconds=%s, last_change_at=NOW()
-                    WHERE hostname=%s
-                """, (ip_address, now, offline_seconds, hostname))
-            else:
-                cur.execute("""
-                    UPDATE device_status
-                    SET ip_address=%s, status='OFFLINE', offline_at=%s, last_change_at=NOW()
-                    WHERE hostname=%s
-                """, (ip_address, now, hostname))
-        else:
-            cur.execute("""
-                UPDATE device_status
-                SET ip_address=%s, last_change_at=NOW()
+                SELECT status, online_at, offline_at
+                FROM device_status
                 WHERE hostname=%s
-            """, (ip_address, hostname))
+                ORDER BY last_change_at DESC
+                LIMIT 1
+            """, (hostname,))
+            row = cur.fetchone()
 
-    conn.commit()
-    cur.close()
-    conn.close()
+            if row is None:
+                ts_col = "online_at" if new_status == "ONLINE" else "offline_at"
+                cur.execute(f"""
+                    INSERT INTO device_status
+                    (ip_address, hostname, status, {ts_col}, last_change_at)
+                    VALUES (%s,%s,%s,%s,NOW())
+                """, (ip_address, hostname, new_status, now))
+            else:
+                last_status, online_at, offline_at = row
+
+                if last_status != new_status:
+                    if new_status == "ONLINE":
+                        offline_seconds = int((now - offline_at).total_seconds()) if offline_at else 0
+                        cur.execute("""
+                            UPDATE device_status
+                            SET ip_address=%s, status='ONLINE', online_at=%s,
+                                offline_duration_seconds=%s, last_change_at=NOW()
+                            WHERE hostname=%s
+                        """, (ip_address, now, offline_seconds, hostname))
+                    else:
+                        cur.execute("""
+                            UPDATE device_status
+                            SET ip_address=%s, status='OFFLINE', offline_at=%s, last_change_at=NOW()
+                            WHERE hostname=%s
+                        """, (ip_address, now, hostname))
+                else:
+                    cur.execute("""
+                        UPDATE device_status
+                        SET ip_address=%s, last_change_at=NOW()
+                        WHERE hostname=%s
+                    """, (ip_address, hostname))
+        conn.commit()
 
 
 def run_printer(serial: str):

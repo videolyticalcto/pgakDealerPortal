@@ -1241,48 +1241,34 @@ def api_scan_db():
         try:
             with psycopg2.connect(_build_dsn()) as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    cur.execute(
-                        """
-                        SELECT serial_number
-                        FROM public.device_master
-                        WHERE serial_number IS NOT NULL
-                        ORDER BY updated_at DESC
+                    # Single JOIN instead of two sequential queries
+                    cur.execute("""
+                        SELECT si.ip_address
+                        FROM public.device_master dm
+                        JOIN public.system_information si
+                            ON si.serial_number = dm.serial_number
+                            AND si.ip_address IS NOT NULL
+                        WHERE dm.serial_number IS NOT NULL
+                        ORDER BY dm.updated_at DESC, si.created_at DESC
                         LIMIT 1
-                        """
-                    )
-                    result = cur.fetchone()
+                    """)
+                    row = cur.fetchone()
 
-                    if result:
-                        detected_serial = result['serial_number']
+                    if row:
+                        ip_data = row['ip_address']
 
-                        cur.execute(
-                            """
-                            SELECT ip_address
-                            FROM public.system_information
-                            WHERE serial_number = %s
-                            AND ip_address IS NOT NULL
-                            ORDER BY created_at DESC
-                            LIMIT 1
-                            """,
-                            (detected_serial,)
-                        )
-                        serial_row = cur.fetchone()
+                        if isinstance(ip_data, dict):
+                            for key, value in ip_data.items():
+                                if isinstance(value, str) and value.count('.') == 3 and not value.startswith('127.'):
+                                    TARGET_IP = value
+                                    agent_id = value
+                                    break
+                        else:
+                            if isinstance(ip_data, str) and not ip_data.startswith('127.'):
+                                TARGET_IP = ip_data
+                                agent_id = ip_data
 
-                        if serial_row:
-                            ip_data = serial_row['ip_address']
-
-                            if isinstance(ip_data, dict):
-                                for key, value in ip_data.items():
-                                    if isinstance(value, str) and value.count('.') == 3 and not value.startswith('127.'):
-                                        TARGET_IP = value
-                                        agent_id = value
-                                        break
-                            else:
-                                if isinstance(ip_data, str) and not ip_data.startswith('127.'):
-                                    TARGET_IP = ip_data
-                                    agent_id = ip_data
-
-                            print(f"   TARGET_IP: {TARGET_IP}, agent_id: {agent_id}")
+                        print(f"   TARGET_IP: {TARGET_IP}, agent_id: {agent_id}")
         except Exception as e:
             print(f"Database error: {e}")
             return jsonify({
@@ -1506,9 +1492,24 @@ def api_save_analytics():
         if not devices:
             return jsonify({"status": "error", "message": "No devices with analytics provided"}), 400
 
-        # ── Resolve pi_serial from DB ────────────────────────────────────
+        # ── Resolve pi_serial from DB (single JOIN query) ──────────────
         pi_serial = None
-    
+        try:
+            with psycopg2.connect(**Config.DB_CONFIG) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT dm.serial_number
+                        FROM public.device_master dm
+                        WHERE dm.serial_number IS NOT NULL
+                        ORDER BY dm.updated_at DESC
+                        LIMIT 1
+                    """)
+                    row = cur.fetchone()
+                    if row and row[0]:
+                        pi_serial = row[0]
+        except Exception as e:
+            logger.warning("Could not resolve pi_serial: %s", e)
+
         logger.info("save-analytics: user_id=%s, pi_serial=%s, devices=%d",
                      user_id, pi_serial, len(devices))
 

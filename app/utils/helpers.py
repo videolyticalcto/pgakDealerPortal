@@ -23,13 +23,18 @@ def generate_unique_code(user_type):
     return code
 
 
+_VALID_CODE_COLUMNS = {'dealer_code', 'distributor_code'}
+
+
 def code_exists_in_db(code, code_column, cur):
     """Check if code already exists in the database"""
-    cur.execute(f"""
-        SELECT 1 FROM user_signups
-        WHERE {code_column} = %s
-        LIMIT 1
-    """, (code,))
+    if code_column not in _VALID_CODE_COLUMNS:
+        raise ValueError(f"Invalid code_column: {code_column}")
+
+    if code_column == 'dealer_code':
+        cur.execute("SELECT 1 FROM user_signups WHERE dealer_code = %s LIMIT 1", (code,))
+    else:
+        cur.execute("SELECT 1 FROM user_signups WHERE distributor_code = %s LIMIT 1", (code,))
     return cur.fetchone() is not None
 
 

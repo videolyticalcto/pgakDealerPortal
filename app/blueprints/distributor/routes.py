@@ -59,50 +59,34 @@ def get_distributor_dealers():
 
         distributor_id = session.get('user_id')
 
-        conn = get_db_conn()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        with get_db_conn() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Single JOIN query instead of two sequential queries
+                cursor.execute("""
+                    SELECT
+                        d.user_id,
+                        d.full_name,
+                        d.address,
+                        d.email,
+                        d.phone_number,
+                        d.gst_no,
+                        d.company_name,
+                        d.pincode,
+                        d.dealer_code,
+                        d.status,
+                        d.created_at
+                    FROM user_signups dist
+                    JOIN user_signups d
+                        ON d.user_type = 'dealer'
+                        AND d.distributor_code = dist.distributor_code
+                    WHERE dist.user_id = %s AND dist.user_type = 'distributor'
+                    ORDER BY d.created_at DESC
+                """, (distributor_id,))
 
-        # First, get the distributor's code
-        cursor.execute("""
-            SELECT distributor_code, full_name, company_name
-            FROM user_signups
-            WHERE user_id = %s AND user_type = 'distributor'
-        """, (distributor_id,))
+                dealers = cursor.fetchall()
 
-        distributor = cursor.fetchone()
-        if not distributor:
-            cursor.close()
-            conn.close()
-            return jsonify({
-                "status": "error",
-                "message": "Distributor not found"
-            }), 404
-
-        distributor_code = distributor['distributor_code']
-
-        # Now fetch all dealers who have this distributor code
-        cursor.execute("""
-            SELECT
-                user_id,
-                full_name,
-                address,
-                email,
-                phone_number,
-                gst_no,
-                company_name,
-                pincode,
-                dealer_code,
-                status,
-                created_at
-            FROM user_signups
-            WHERE user_type = 'dealer'
-            AND distributor_code = %s
-            ORDER BY created_at DESC
-        """, (distributor_code,))
-
-        dealers = cursor.fetchall()
-        cursor.close()
-        conn.close()
+        if dealers is None:
+            dealers = []
 
         # Convert to list format
         dealers_list = []
