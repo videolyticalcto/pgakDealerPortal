@@ -1,0 +1,355 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Devices Management</h1>
+            <p class="header-subtitle" id="pageSubtitle">Manage all registered devices</p>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <!-- Devices View -->
+    <div id="devicesView">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-900); margin: 0;">Device Management</h3>
+                <p style="font-size: 14px; color: var(--gray-500); margin-top: 4px; margin-bottom: 0;">All registered devices</p>
+            </div>
+            <button class="btn btn-primary" onclick="openIssueDevicesFromDevicesView()">
+                <i class="fas fa-qrcode"></i>
+                Issue Devices
+            </button>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--gray-700);">Show:</span>
+            <select id="deviceStatusFilter" class="filter-select" onchange="onDeviceStatusFilterChange()">
+                <option value="online">Online Devices</option>
+                <option value="all">All Devices</option>
+            </select>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Status</th>
+                        <th>Last Seen</th>
+                        <th>Details</th>
+                        <th>Print QR</th>
+                    </tr>
+                </thead>
+                <tbody id="devicesRows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Issues/Device Issuance View -->
+    <div id="issuesView" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--gray-900); margin: 0;">Issue Devices</h2>
+            <button class="btn btn-secondary" onclick="goBackToDevicesView()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Devices
+            </button>
+        </div>
+
+        <div id="issueTypeSelection">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-900); margin-bottom: 24px;">Select Issue Type:</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <button class="issue-type-btn" onclick="selectIssueType('dealer')">Issue device to Dealer</button>
+                <button class="issue-type-btn" onclick="selectIssueType('distributor')">Issue device to Distributor</button>
+            </div>
+        </div>
+        <div id="userListContainer" style="display: none; margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 id="userListTitle" style="font-size: 16px; font-weight: 600; color: var(--gray-900); margin: 0;"></h3>
+                <button class="filter-btn" onclick="goBackFromUserList()">&#8592; Back</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Phone No</th>
+                            <th>Company</th>
+                            <th>Code</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-200);">
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchFullName" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchAddress" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchEmail" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchPhoneNo" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchCompany" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchCode" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchStatus" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none; text-align: center;">
+                                <button onclick="clearIssueColumnFilters()" style="padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">Clear</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="issueUserTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: var(--gray-500);">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Detail Page for Devices -->
+<div id="deviceMobileDetailPage" class="device-mobile-detail-page">
+    <div class="device-mobile-detail-header">
+        <button class="device-mobile-detail-back-btn" id="deviceMobileDetailBackBtn" type="button" onclick="closeDeviceDetailPage()">&#8592;</button>
+        <div class="device-mobile-detail-title" id="deviceMobileDetailTitle">Device Details</div>
+    </div>
+    <div class="device-mobile-detail-content" id="deviceMobileDetailContent">
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="qr-modal-overlay" id="qrModalOverlay">
+    <div class="qr-modal-content">
+        <button class="qr-modal-close" id="qrCloseBtn" onclick="closeQRScanner()">&#10005;</button>
+        <div class="qr-modal-header">Scan QR Code On Device</div>
+        <div class="qr-status" id="qrStatus" style="display: none;"></div>
+        <video id="qrVideo" autoplay muted playsinline></video>
+
+        <!-- Manual serial input fallback (shown when camera unavailable) -->
+        <div id="manualSerialInput" style="display: none; padding: 16px; text-align: center;">
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                <input type="text" id="manualSerialField" placeholder="Enter serial number"
+                    style="padding: 10px 14px; border: 2px solid var(--gray-300); border-radius: 8px; font-size: 16px; width: 250px; text-transform: uppercase;"
+                    onkeydown="if(event.key==='Enter') submitManualSerial()">
+                <button onclick="submitManualSerial()"
+                    style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600;">
+                    Submit
+                </button>
+            </div>
+        </div>
+
+        <div id="validationMessage" class="validation-message">
+            <span class="validation-icon" id="validationIcon"></span>
+            <span class="validation-text" id="validationText"></span>
+        </div>
+        <div id="issueStatusMessage" style="display: none;"></div>
+        <div id="macAddress" class="mac-highlight">
+            <strong>Serial Number Captured:</strong>
+            <code id="macAddressValue"></code>
+        </div>
+
+        <div id="successMessage" class="validation-message success" style="display: none;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span class="validation-icon">&#10003;</span>
+                <span class="validation-text" id="successText">Device issued successfully!</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="closeQRScanner()">Close</button>
+            </div>
+        </div>
+        <div id="errorMessage" class="validation-message error" style="display: none;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span class="validation-icon">&#10007;</span>
+                <span class="validation-text" id="errorText">Invalid serial number</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="resetQRScanner()">Try Again</button>
+                <button class="modal-btn secondary" onclick="closeQRScanner()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credentials Modal -->
+<div id="credentialsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-lock"></i> Network Scan Credentials</h2>
+            <button class="modal-close" onclick="closeCredentialsModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 24px;">
+                Enter credentials to scan for cameras on the network.
+            </p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="modalUsername" placeholder="e.g., admin" value="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-input-group">
+                    <input type="password" id="modalPassword" placeholder="Enter password">
+                    <button class="toggle-password" type="button" onclick="toggleModalPassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeCredentialsModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="modal-btn primary" id="scanBtn" onclick="startNetworkScan()">
+                    <i class="fas fa-search"></i> Scan Network
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print QR Code Modal -->
+<div id="printQRModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-qrcode"></i> Print QR Code</h2>
+            <button class="modal-close" onclick="closePrintQRModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Select Device (Online Devices Only)</label>
+                <select id="printDeviceSelect" class="device-select" onchange="onPrintDeviceSelected()">
+                    <option value="">-- Select a device --</option>
+                    <option value="loading" disabled>Loading online devices...</option>
+                </select>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">
+                    Only devices with ACTIVE/ONLINE status in system_information are shown
+                </div>
+            </div>
+
+            <div id="devicePrintInfo" style="display: none; margin-bottom: 20px;">
+                <div class="details-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="details-item">
+                        <strong>Serial Number</strong>
+                        <code id="printSerial">-</code>
+                    </div>
+                    <div class="details-item">
+                        <strong>Status</strong>
+                        <span id="printStatus">-</span>
+                    </div>
+                    <div class="details-item">
+                        <strong>Hostname</strong>
+                        <code id="printHostname">-</code>
+                    </div>
+                    <div class="details-item">
+                        <strong>QR Status</strong>
+                        <span id="printQrStatus">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Print Configuration</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                    <div>
+                        <label style="font-size: 12px; color: var(--gray-600); display: block; margin-bottom: 4px;">Prefix</label>
+                        <input type="text" id="printPrefix" value="DEV" style="width: 100%; padding: 8px; border: 1px solid var(--gray-300); border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: var(--gray-600); display: block; margin-bottom: 4px;">Digits</label>
+                        <input type="number" id="printDigits" value="6" min="3" max="10" style="width: 100%; padding: 8px; border: 1px solid var(--gray-300); border-radius: 6px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Print Mode</label>
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="printMode" value="windows" checked onchange="togglePrintOptions()">
+                        <span>Windows Printer</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="printMode" value="network" onchange="togglePrintOptions()">
+                        <span>Network Printer</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="printMode" value="preview" onchange="togglePrintOptions()">
+                        <span>Preview Only</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="windowsPrinterOptions" class="print-options" style="display: block;">
+                <div class="form-group">
+                    <label>Select Printer</label>
+                    <select id="printPrinterSelect" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px;">
+                        <option value="">Loading printers...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="networkPrinterOptions" class="print-options" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>IP Address</label>
+                        <input type="text" id="printNetworkIP" placeholder="192.168.1.100" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Port</label>
+                        <input type="number" id="printNetworkPort" value="9100" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px;">
+                    </div>
+                </div>
+            </div>
+
+            <div id="previewOptions" class="print-options" style="display: none;">
+                <div class="form-group">
+                    <label>QR Code Preview</label>
+                    <div style="background: var(--gray-50); padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--gray-200); margin-top: 8px;">
+                        <div id="qrPreview" style="display: inline-block; background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                            <div style="color: var(--gray-400); padding: 20px;">Select device to preview</div>
+                        </div>
+                        <div style="margin-top: 12px; font-family: monospace; font-size: 14px; color: var(--gray-700);" id="previewCode"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="printDryRun" style="width: 16px; height: 16px;">
+                    <span>Dry Run (don't actually print)</span>
+                </label>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 24px;">
+                <button type="button" class="modal-btn primary" onclick="printQRCode()" id="printBtn">
+                    <i class="fas fa-print"></i>
+                    Print QR Code
+                </button>
+                <button type="button" class="modal-btn secondary" onclick="closePrintQRModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+
+            <div id="printStatusMessage" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="/static/js/admin/dashboard.js"></script>
+{% endblock %}

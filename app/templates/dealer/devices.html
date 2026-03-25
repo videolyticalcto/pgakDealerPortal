@@ -1,0 +1,250 @@
+{% extends "dealer/base_dealer.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Devices Management</h1>
+            <p class="header-subtitle" id="pageSubtitle">Manage your devices</p>
+        </div>
+        <div class="dealer-code-container">
+            <div class="dealer-code-label">Dealer Code</div>
+            <div class="dealer-code-display">
+                <code id="dealerCode" class="dealer-code-value">Loading...</code>
+                <button class="copy-code-btn" id="copyCodeBtn" onclick="copyDealerCode()" title="Copy code">Copy</button>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <!-- Devices View -->
+    <div id="devicesView">
+        <div class="issue-devices-header">
+            <h3>Devices Management</h3>
+            <button class="issue-devices-btn" onclick="openIssueDevicesWithValidation()">
+                <i class="fas fa-qrcode"></i>
+                Issue Devices
+            </button>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--gray-700);">Show:</span>
+            <select id="deviceStatusFilter" class="filter-select" onchange="onDeviceStatusFilterChange()">
+                <option value="online">Online Devices</option>
+                <option value="all">All Devices</option>
+            </select>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Status</th>
+                        <th>Last Seen</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="devicesRows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Issues View -->
+    <div id="issuesView" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--gray-900); margin: 0;">Issue Devices</h2>
+            <button class="btn btn-secondary" onclick="goBackToDevicesView()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Devices
+            </button>
+        </div>
+        <div id="issueTypeSelection">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-900); margin-bottom: 24px;">Select Issue Type:</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <button class="issue-type-btn" onclick="selectIssueType('customer')">Issue device to Customer</button>
+            </div>
+        </div>
+
+        <div id="userListContainer" style="display: none; margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 id="userListTitle" style="font-size: 16px; font-weight: 600; color: var(--gray-900); margin: 0;"></h3>
+                <button class="details-btn" onclick="goBackFromUserList()">&#8592; Back</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Phone No</th>
+                            <th>Company</th>
+                            <th style="display:none;">ID/Code</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-200);">
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchFullName" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchAddress" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchEmail" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchPhoneNo" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchCompany" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none; display:none;">
+                                <input type="text" id="issueSearchCode" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none;">
+                                <input type="text" id="issueSearchStatus" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyIssueColumnFilters()">
+                            </th>
+                            <th style="padding: 8px; border: none; text-align: center;">
+                                <button onclick="clearIssueColumnFilters()" style="padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">Clear</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="issueUserTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-500);">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Device Detail Page -->
+<div id="deviceMobileDetailPage" class="mobile-detail-page">
+    <div class="mobile-detail-header">
+        <button class="mobile-detail-back-btn" onclick="closeDeviceDetailPage()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="mobile-detail-title" id="deviceMobileDetailTitle">Device Details</div>
+    </div>
+    <div class="mobile-detail-content" id="deviceMobileDetailContent">
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="qr-modal-overlay" id="qrModalOverlay">
+    <div class="qr-modal-content">
+        <button class="qr-modal-close" id="qrCloseBtn" onclick="closeQRScanner()">&#10005;</button>
+        <div class="qr-modal-header">Scan QR Code On Device</div>
+        <div class="qr-status" id="qrStatus" style="display: none;"></div>
+        <video id="qrVideo" autoplay muted playsinline></video>
+
+        <!-- Manual serial input fallback (shown when camera unavailable) -->
+        <div id="manualSerialInput" style="display: none; padding: 16px; text-align: center;">
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                <input type="text" id="manualSerialField" placeholder="Enter serial number"
+                    style="padding: 10px 14px; border: 2px solid var(--gray-300); border-radius: 8px; font-size: 16px; width: 250px; text-transform: uppercase;"
+                    onkeydown="if(event.key==='Enter') submitManualSerial()">
+                <button onclick="submitManualSerial()"
+                    style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600;">
+                    Submit
+                </button>
+            </div>
+        </div>
+
+        <div id="validationMessage" class="validation-message">
+            <span class="validation-icon" id="validationIcon"></span>
+            <span class="validation-text" id="validationText"></span>
+        </div>
+        <div id="issueStatusMessage" style="display: none;"></div>
+
+        <div id="macAddress" class="mac-highlight">
+            <strong>Serial Number Captured:</strong>
+            <code id="macAddressValue"></code>
+        </div>
+
+        <div id="nextStepContainer" class="next-step-container">
+            <div class="next-step-label">Device Discovery</div>
+            <div class="next-step-buttons">
+                <button class="next-step-btn-secondary" onclick="openCredentialsModal()">
+                    <i class="fas fa-network-wired"></i>
+                    Scan Cameras In This Network
+                </button>
+            </div>
+        </div>
+
+        <div id="successMessage" class="validation-message success" style="display: none;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span class="validation-icon">&#10003;</span>
+                <span class="validation-text" id="successText">Device issued successfully!</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="closeQRScanner()">Close</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="validation-message error" style="display: none;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span class="validation-icon">&#10007;</span>
+                <span class="validation-text" id="errorText">Invalid serial number</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="resetQRScanner()">Try Again</button>
+                <button class="modal-btn secondary" onclick="closeQRScanner()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credentials Modal -->
+<div id="credentialsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-lock"></i> Network Scan Credentials</h2>
+            <button class="modal-close" onclick="closeCredentialsModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 24px;">
+                Enter credentials to scan for cameras on the network.
+            </p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="modalUsername" placeholder="e.g., admin" value="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-input-group">
+                    <input type="password" id="modalPassword" placeholder="Enter password">
+                    <button class="toggle-password" type="button" onclick="toggleModalPassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeCredentialsModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="modal-btn primary" id="scanBtn" onclick="startNetworkScan()">
+                    <i class="fas fa-search"></i> Scan Network
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Full Screen Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <div class="image-modal-content">
+        <img id="modalImage" src="" alt="Full Screen Image">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="/static/js/dealer/dashboard.js"></script>
+{% endblock %}

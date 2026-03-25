@@ -1,0 +1,59 @@
+{% extends "distributor/base_distributor.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Dashboard</h1>
+            <p class="header-subtitle" id="pageSubtitle">Welcome to Distributor Dashboard</p>
+        </div>
+        <div class="distributor-code-container">
+            <div class="distributor-code-label">Distributor Code</div>
+            <div class="distributor-code-display">
+                <code id="distributorCode" class="distributor-code-value">Loading...</code>
+                <button class="copy-code-btn" id="copyCodeBtn" onclick="copyDistributorCode()" title="Copy code">Copy</button>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="dashboardView">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Dealers</div>
+                <div class="stat-value" id="totalDealers">0</div>
+                <div class="stat-subtext">Registered dealers</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Approved Dealers</div>
+                <div class="stat-value" id="approvedDealers">0</div>
+                <div class="stat-subtext">Active dealers</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-label">Pending Dealers</div>
+                <div class="stat-value" id="pendingDealers">0</div>
+                <div class="stat-subtext">Awaiting approval</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Devices</div>
+                <div class="stat-value" id="totalDevices">0</div>
+                <div class="stat-subtext">All registered devices</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Online Devices</div>
+                <div class="stat-value" id="onlineDevices">0</div>
+                <div class="stat-subtext">Currently active</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Offline Devices</div>
+                <div class="stat-value" id="offlineDevices">0</div>
+                <div class="stat-subtext">Currently inactive</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/distributor/dashboard.js"></script>
+{% endblock %}

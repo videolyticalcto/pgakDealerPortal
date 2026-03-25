@@ -1,0 +1,268 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Users Management</h1>
+            <p class="header-subtitle" id="pageSubtitle">Manage dealers and distributors</p>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="usersView">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-900); margin: 0;">Users Management</h3>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateUserModal()">
+                <i class="fas fa-plus"></i>
+                Create User
+            </button>
+        </div>
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <button id="filterAllBtn" class="filter-btn" onclick="filterUsers('all')">All Users</button>
+            <button id="filterPendingBtn" class="filter-btn active" onclick="filterUsers('pending')">Pending</button>
+            <button id="filterApprovedBtn" class="filter-btn" onclick="filterUsers('approved')">Approved</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Phone No</th>
+                        <th>Company</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-200);">
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchFullName" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchAddress" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchEmail" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchPhoneNo" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchCompany" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchType" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchStatus" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px;" onkeyup="applyColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none; text-align: center;">
+                            <button onclick="clearColumnFilters()" style="padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">Clear</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: var(--gray-500);">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Detail Page for Users -->
+<div id="mobileDetailPage" class="mobile-detail-page">
+    <div class="mobile-detail-header">
+        <button class="mobile-detail-back-btn" id="mobileDetailBackBtn" type="button" onclick="closeUserDetailPage()">&#8592;</button>
+        <div class="mobile-detail-title" id="mobileDetailTitle">User Details</div>
+    </div>
+    <div class="mobile-detail-content" id="mobileDetailContent">
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Edit User Details</h2>
+            <button class="modal-close" onclick="closeEditUserModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="editFullName" required>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <input type="text" id="editAddress" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="editPhoneNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Name *</label>
+                    <input type="text" id="editCompanyName" required>
+                </div>
+                <div class="form-group">
+                    <label>User Type *</label>
+                    <select id="editUserType" required disabled>
+                        <option value="dealer">Dealer</option>
+                        <option value="distributor">Distributor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select id="editStatus" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>GST Number</label>
+                    <input type="text" id="editGstNo">
+                </div>
+                <div class="form-group">
+                    <label>Pincode</label>
+                    <input type="text" id="editPincode">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label>Dealer Code</label>
+                        <input type="text" id="editDealerCode" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Distributor Code</label>
+                        <input type="text" id="editDistributorCode" readonly>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="modal-btn secondary" onclick="closeEditUserModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div id="createUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+            <button class="modal-close" onclick="closeCreateUserModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="createFullName" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <input type="text" id="createAddress" placeholder="Enter address" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="createEmail" placeholder="Enter email address" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="createPhoneNumber" placeholder="Enter phone number" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Name *</label>
+                    <input type="text" id="createCompanyName" placeholder="Enter company name" required>
+                </div>
+                <div class="form-group">
+                    <label>User Type *</label>
+                    <select id="createUserType" required>
+                        <option value="">Select User Type</option>
+                        <option value="dealer">Dealer</option>
+                        <option value="distributor">Distributor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>GST Number *</label>
+                    <input type="text" id="createGstNo" placeholder="Enter GST number" required>
+                </div>
+                <div class="form-group">
+                    <label>Pincode *</label>
+                    <input type="text" id="createPincode" placeholder="Enter pincode" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <div class="password-input-group">
+                        <input type="password" id="createPassword" placeholder="Enter password (min 8 characters)" required>
+                        <button class="toggle-password" type="button" onclick="toggleCreatePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password *</label>
+                    <div class="password-input-group">
+                        <input type="password" id="createConfirmPassword" placeholder="Confirm password" required>
+                        <button class="toggle-password" type="button" onclick="toggleCreateConfirmPassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-check"></i> Create User
+                    </button>
+                    <button type="button" class="modal-btn secondary" onclick="closeCreateUserModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-trash" style="color: var(--danger);"></i> Delete User</h2>
+            <button class="modal-close" onclick="closeDeleteConfirmModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 16px; color: var(--gray-900); margin-bottom: 8px;">
+                Are you sure you want to delete <strong id="deleteUserName"></strong>?
+            </p>
+            <p style="font-size: 14px; color: var(--gray-500); margin-bottom: 24px;">
+                This action cannot be undone.
+            </p>
+            <div class="modal-buttons">
+                <button class="modal-btn danger" onclick="confirmDelete()">
+                    <i class="fas fa-check"></i> Delete User
+                </button>
+                <button class="modal-btn secondary" onclick="closeDeleteConfirmModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin/dashboard.js"></script>
+{% endblock %}

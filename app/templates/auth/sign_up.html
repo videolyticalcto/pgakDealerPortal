@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Device Monitor - Login & Signup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h2 class="portal-title">
+            <img src="/static/images/logo_dealer.jpeg" class="portal-logo">
+            Pgak Dealer Portal
+        </h2>
+        <p class="sub">Manage Your Devices</p>
+    </div>
+
+    <!-- ==================== LOGIN FORM ==================== -->
+    <div id="login-section" class="form-section active">
+        <form id="login-form" onsubmit="handleLoginSubmit(event)">
+            <div class="input-group">
+                <label for="login_contact">Email Address or Phone Number</label>
+                <input
+                    type="text"
+                    id="login_contact"
+                    name="contact"
+                    placeholder="Enter email or phone number"
+                    required
+                />
+            </div>
+
+            <div class="input-group">
+                <label for="login_password">Password</label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="login_password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    />
+                    <button type="button" class="eye-toggle-btn" onclick="togglePassword('login_password', this)" title="Show/Hide Password" aria-label="Toggle password visibility">&#128274;</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="login-btn">Login</button>
+        </form>
+    </div>
+
+    <!-- ==================== SIGNUP FORM (DEALER/DISTRIBUTOR) ==================== -->
+    <div id="signup-section" class="form-section">
+        <form id="dealer-signup-form" onsubmit="handleSignupSubmit(event)">
+            <input type="hidden" name="status" value="Pending" />
+
+            <div class="input-group">
+                <label class="user-type-label">Account Type <span class="required-star">*</span></label>
+                <select id="user_type_select" name="user_type" required>
+                    <option value="dealer" selected>Dealer</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_full_name">Full Name <span class="required-star">*</span></label>
+                <input type="text" id="dealer_full_name" name="full_name" required placeholder="Enter your full name" />
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_address">Address<span class="required-star">*</span></label>
+                <input type="text" id="dealer_address" name="address" required placeholder="Enter your address" />
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_phone">Phone Number<span class="required-star">*</span></label>
+                <div class="phone-input-group">
+                    <input type="tel" id="dealer_phone" name="phone_number" required placeholder="Enter your phone number" />
+                    <button type="button" class="verify-btn" onclick="sendOTP('phone', 'dealer_phone', this)">Verify</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_email">Email Address<span class="required-star">*</span></label>
+                <div class="phone-input-group">
+                    <input type="email" id="dealer_email" name="email" required placeholder="Enter your email address" />
+                    <button type="button" class="verify-btn" onclick="sendOTP('email', 'dealer_email', this)">Verify</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_gst">GST Number<span class="required-star">*</span></label>
+                <input type="text" id="dealer_gst" name="gst_no" placeholder="Enter your GST Number" />
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_company">Company Name<span class="required-star">*</span></label>
+                <input type="text" id="dealer_company" name="company_name" placeholder="Enter your Company Name" />
+            </div>
+
+            <!-- Enhanced Pincode Input with Autocomplete -->
+            <div class="input-group">
+                <label for="dealer_pincode" id="pincode_label">Pincode<span class="required-star">*</span></label>
+                <div class="pincode-input-wrapper">
+                    <input
+                        type="text"
+                        id="dealer_pincode"
+                        name="pincode"
+                        required
+                        placeholder="Enter your pincode"
+                        oninput="handlePincodeInput(event)"
+                        autocomplete="off"
+                    />
+                    <div id="pincode-dropdown" class="pincode-dropdown"></div>
+                </div>
+                <div id="pincode-info" class="pincode-info"></div>
+            </div>
+
+            <!-- Hidden distributor-code-group element so JS references don't break -->
+            <div class="input-group distributor-code-group" id="distributor-code-group" style="display:none;">
+                <label for="dealer_code">Distributor Code (Optional for Dealers)</label>
+                <input type="text" id="dealer_code" name="distributor_code" placeholder="Enter the distributor code you belong to (optional)" />
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_password">Password<span class="required-star">*</span></label>
+                <div class="password-wrapper">
+                    <input type="password" id="dealer_password" name="password" required placeholder="Enter your password" />
+                    <button type="button" class="eye-toggle-btn" onclick="togglePassword('dealer_password', this)" title="Show/Hide Password" aria-label="Toggle password visibility">&#128274;</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="dealer_confirm_password">Confirm Password<span class="required-star">*</span></label>
+                <div class="password-wrapper">
+                    <input type="password" id="dealer_confirm_password" name="confirm_password" required placeholder="Confirm your password" />
+                    <button type="button" class="eye-toggle-btn" onclick="togglePassword('dealer_confirm_password', this)" title="Show/Hide Password" aria-label="Toggle password visibility">&#128274;</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Sign Up</button>
+        </form>
+    </div>
+
+    <!-- Signup/Login toggle link -->
+    <div class="signup-note" id="toggle-note">
+        Don't have an account? <a onclick="switchForm('signup')">Sign Up here</a>
+    </div>
+</div>
+
+<!-- OTP Verification Modal -->
+<div id="otpModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="otpModalTitle">Verify Your Phone Number</h3>
+        </div>
+
+        <div class="modal-body">
+            <!-- Verification Method Toggle -->
+            <div class="verification-method-toggle" id="verificationMethodToggle" style="display: none;">
+                <button type="button" class="active" onclick="switchVerificationMethod('current')">Sent Now</button>
+                <button type="button" onclick="switchVerificationMethod('alternative')">Use Alternative</button>
+            </div>
+
+            <p id="otpMessage">Enter the 4-digit OTP sent to your phone</p>
+
+            <div class="otp-input-group">
+                <input type="text" class="otp-input" maxlength="1" placeholder="0" />
+                <input type="text" class="otp-input" maxlength="1" placeholder="0" />
+                <input type="text" class="otp-input" maxlength="1" placeholder="0" />
+                <input type="text" class="otp-input" maxlength="1" placeholder="0" />
+            </div>
+
+            <div class="timer" id="otpTimer">Time remaining: <span id="timerValue">300</span>s</div>
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+        </div>
+
+        <div class="modal-buttons">
+            <button type="button" class="modal-btn modal-btn-submit" onclick="verifyOTP()">Verify OTP</button>
+            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeOTPModal()">Cancel</button>
+        </div>
+
+        <div class="resend-link">
+            <a id="resendLink" onclick="resendOTP()" class="disabled">Resend OTP</a>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+
+</body>
+</html>

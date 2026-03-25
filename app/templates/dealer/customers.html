@@ -1,0 +1,86 @@
+{% extends "dealer/base_dealer.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Customers</h1>
+            <p class="header-subtitle" id="pageSubtitle">Manage your customers</p>
+        </div>
+        <div class="dealer-code-container">
+            <div class="dealer-code-label">Dealer Code</div>
+            <div class="dealer-code-display">
+                <code id="dealerCode" class="dealer-code-value">Loading...</code>
+                <button class="copy-code-btn" id="copyCodeBtn" onclick="copyDealerCode()" title="Copy code">Copy</button>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="customersView">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Phone No</th>
+                        <th>Company</th>
+                        <th style="display:none;">Customer ID</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-200);">
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchFullName" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchAddress" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchEmail" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchPhoneNo" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchCompany" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none; display:none;">
+                            <input type="text" id="searchCustomerId" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none;">
+                            <input type="text" id="searchStatus" placeholder="Search..." style="width: 100%; padding: 6px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 16px;" onkeyup="applyCustomerColumnFilters()">
+                        </th>
+                        <th style="padding: 8px; border: none; text-align: center;">
+                            <button onclick="clearCustomerColumnFilters()" style="padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">Clear</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="customersTable">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-500);">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Customer Detail Page -->
+<div id="customerMobileDetailPage" class="mobile-detail-page">
+    <div class="mobile-detail-header">
+        <button class="mobile-detail-back-btn" onclick="closeCustomerDetailPage()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="mobile-detail-title" id="customerMobileDetailTitle">Customer Details</div>
+    </div>
+    <div class="mobile-detail-content" id="customerMobileDetailContent">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dealer/dashboard.js"></script>
+{% endblock %}

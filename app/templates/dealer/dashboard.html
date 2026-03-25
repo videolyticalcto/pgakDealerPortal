@@ -1,0 +1,49 @@
+{% extends "dealer/base_dealer.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Dashboard</h1>
+            <p class="header-subtitle" id="pageSubtitle">Welcome to Dealer Dashboard</p>
+        </div>
+        <div class="dealer-code-container">
+            <div class="dealer-code-label">Dealer Code</div>
+            <div class="dealer-code-display">
+                <code id="dealerCode" class="dealer-code-value">Loading...</code>
+                <button class="copy-code-btn" id="copyCodeBtn" onclick="copyDealerCode()" title="Copy code">Copy</button>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="dashboardView">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Customers</div>
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-subtext">Registered customers</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Total Devices</div>
+                <div class="stat-value" id="totalDevices">0</div>
+                <div class="stat-subtext">All registered devices</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Online Devices</div>
+                <div class="stat-value" id="onlineDevices">0</div>
+                <div class="stat-subtext">Currently active</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Offline Devices</div>
+                <div class="stat-value" id="offlineDevices">0</div>
+                <div class="stat-subtext">Currently inactive</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dealer/dashboard.js"></script>
+{% endblock %}

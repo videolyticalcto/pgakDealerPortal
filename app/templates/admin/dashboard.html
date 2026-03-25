@@ -1,0 +1,52 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title" id="pageTitle">Dashboard</h1>
+            <p class="header-subtitle" id="pageSubtitle">Welcome to Admin Dashboard</p>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="dashboardView">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Dealers</div>
+                <div class="stat-value" id="totalDealers">0</div>
+                <div class="stat-subtext">Registered dealers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Distributors</div>
+                <div class="stat-value" id="totalDistributors">0</div>
+                <div class="stat-subtext">Registered distributors</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-label">Pending Requests</div>
+                <div class="stat-value" id="pendingRequests">0</div>
+                <div class="stat-subtext">Awaiting approval</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Total Devices</div>
+                <div class="stat-value" id="totalDevices">0</div>
+                <div class="stat-subtext">All registered devices</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Online Devices</div>
+                <div class="stat-value" id="onlineDevices">0</div>
+                <div class="stat-subtext">Currently active</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Offline Devices</div>
+                <div class="stat-value" id="offlineDevices">0</div>
+                <div class="stat-subtext">Currently inactive</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin/dashboard.js"></script>
+{% endblock %}

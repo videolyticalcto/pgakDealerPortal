@@ -1,0 +1,10 @@
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.env
+selfsigned.crt
+selfsigned.key
+dealer_pgak_co_in.crt
+dealer_pgak.key

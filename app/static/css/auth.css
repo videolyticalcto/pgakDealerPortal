@@ -1,0 +1,665 @@
+/* =============================================
+   AUTH.CSS - Login/Signup page styles
+   ============================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0f111a;
+    color: #c9d1d9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+/* =============================================
+   AUTH CONTAINER
+   ============================================= */
+.auth-container {
+    background-color: #161b22;
+    padding: 40px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h2 {
+    color: #58a6ff;
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+}
+
+.auth-header .sub {
+    color: #8b949e;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Portal Title & Logo */
+.portal-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.portal-logo {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* =============================================
+   TOGGLE AUTH (Login/Signup tabs)
+   ============================================= */
+.toggle-auth {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    background-color: #0b0d12;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.toggle-auth button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    color: #8b949e;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.toggle-auth button.active {
+    background-color: #238636;
+    color: white;
+}
+
+.toggle-auth button:hover:not(.active) {
+    background-color: #21262d;
+}
+
+/* Form visibility */
+.form-section {
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+}
+
+/* =============================================
+   INPUT GROUPS
+   ============================================= */
+.input-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8b949e;
+    font-size: 0.95rem;
+}
+
+.required-star {
+    color: #ff4d4d;
+    margin-left: 3px;
+    font-weight: bold;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    padding: 12px;
+    background-color: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus, .input-group select:focus {
+    border-color: #58a6ff;
+    outline: none;
+    background-color: #0b0d12;
+}
+
+/* =============================================
+   PASSWORD EYE TOGGLE
+   ============================================= */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 46px !important;
+}
+
+.eye-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8b949e;
+    font-size: 18px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    z-index: 2;
+}
+
+.eye-toggle-btn:hover {
+    color: #58a6ff;
+}
+
+.eye-toggle-btn:focus {
+    outline: none;
+    color: #58a6ff;
+}
+
+/* =============================================
+   PHONE / EMAIL INPUT GROUP WITH VERIFY
+   ============================================= */
+.phone-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.phone-input-group input {
+    flex: 1;
+}
+
+.verify-btn {
+    background-color: #58a6ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.verify-btn:hover:not(:disabled) {
+    background-color: #79c0ff;
+}
+
+.verify-btn.verified {
+    background-color: #00ff99;
+    cursor: default;
+}
+
+.verify-btn.verified:hover {
+    background-color: #00ff99;
+}
+
+.verify-btn.loading {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* =============================================
+   VERIFICATION METHOD TOGGLE
+   ============================================= */
+.verification-method-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    background-color: #0b0d12;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.verification-method-toggle button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background-color: transparent;
+    color: #8b949e;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.verification-method-toggle button.active {
+    background-color: #238636;
+    color: white;
+    font-weight: bold;
+}
+
+/* =============================================
+   PINCODE DROPDOWN
+   ============================================= */
+.pincode-input-wrapper {
+    position: relative;
+}
+
+.pincode-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #21262d;
+    border: 1px solid #30363d;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.pincode-dropdown.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 12px;
+    color: #c9d1d9;
+    cursor: pointer;
+    border-bottom: 1px solid #30363d;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #30363d;
+    padding-left: 16px;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item-code {
+    font-weight: bold;
+    color: #58a6ff;
+}
+
+.dropdown-item-details {
+    font-size: 0.85rem;
+    color: #8b949e;
+    margin-top: 4px;
+}
+
+.dropdown-loading {
+    padding: 12px;
+    text-align: center;
+    color: #8b949e;
+}
+
+.dropdown-empty {
+    padding: 12px;
+    text-align: center;
+    color: #8b949e;
+}
+
+/* Selected pincode info display */
+.pincode-info {
+    background-color: #0b0d12;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.pincode-info.show {
+    display: block;
+}
+
+.pincode-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    color: #8b949e;
+}
+
+.pincode-info-row:last-child {
+    margin-bottom: 0;
+}
+
+.pincode-info-label {
+    font-weight: bold;
+    color: #58a6ff;
+}
+
+/* =============================================
+   SUBMIT BUTTON
+   ============================================= */
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #238636;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background-color: #2ea043;
+}
+
+.submit-btn:disabled {
+    background-color: #6e8a14;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* =============================================
+   USER TYPE
+   ============================================= */
+.user-type-label {
+    display: block;
+    margin-bottom: 10px;
+    color: #8b949e;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+/* Distributor code group (hidden by default) */
+.distributor-code-group {
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.distributor-code-group.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================
+   SIGNUP NOTE
+   ============================================= */
+.signup-note {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #30363d;
+    color: #8b949e;
+    font-size: 0.95rem;
+}
+
+.signup-note a {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.signup-note a:hover {
+    text-decoration: underline;
+}
+
+/* =============================================
+   OTP MODAL
+   ============================================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #161b22;
+    padding: 30px;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header h3 {
+    color: #58a6ff;
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+}
+
+.modal-body p {
+    color: #8b949e;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+/* OTP Input */
+.otp-input-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.otp-input {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: #21262d;
+    color: #c9d1d9;
+    border: 2px solid #30363d;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.otp-input:focus {
+    border-color: #58a6ff;
+    background-color: #0b0d12;
+}
+
+.otp-input.error {
+    border-color: #ff4d4d;
+    background-color: #21262d;
+}
+
+/* Timer */
+.timer {
+    text-align: center;
+    color: #8b949e;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.timer.warning {
+    color: #ffa657;
+    font-weight: bold;
+}
+
+.timer.expired {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-submit {
+    background-color: #238636;
+    color: white;
+    flex: 1;
+}
+
+.modal-btn-submit:hover:not(:disabled) {
+    background-color: #2ea043;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
+}
+
+.modal-btn-submit:disabled {
+    background-color: #6e8a14;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.modal-btn-cancel {
+    background-color: #2d333b;
+    color: #c9d1d9;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #3d444c;
+}
+
+/* =============================================
+   MESSAGES
+   ============================================= */
+.error-message {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.success-message {
+    color: #00ff99;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Resend Link */
+.resend-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.resend-link a {
+    color: #58a6ff;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.resend-link a:hover {
+    text-decoration: underline;
+}
+
+.resend-link a.disabled {
+    color: #8b949e;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* =============================================
+   RESPONSIVE - Mobile (max 768px)
+   ============================================= */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 30px 20px;
+    }
+
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .pincode-dropdown {
+        max-height: 250px;
+    }
+
+    .eye-toggle-btn {
+        font-size: 20px;
+        padding: 8px;
+        right: 8px;
+    }
+}
