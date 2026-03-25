@@ -1671,7 +1671,9 @@
             if (currentFilter === 'pending') {
                 filteredUsers = filteredUsers.filter(([_, u]) => (u.status || '').toLowerCase() === 'pending');
             } else if (currentFilter === 'approved') {
-                filteredUsers = filteredUsers.filter(([_, u]) => u.status === 'approved' || u.status === 'Approved');
+                filteredUsers = filteredUsers.filter(([_, u]) => (u.status || '').toLowerCase() === 'approved');
+            } else if (currentFilter === 'rejected') {
+                filteredUsers = filteredUsers.filter(([_, u]) => (u.status || '').toLowerCase() === 'rejected');
             }
             // ✅ Apply column filters
             filteredUsers = filteredUsers.filter(([userId, user]) => {
@@ -1910,7 +1912,8 @@
             const filterMap = {
                 'all': 'filterAllBtn',
                 'pending': 'filterPendingBtn',
-                'approved': 'filterApprovedBtn'
+                'approved': 'filterApprovedBtn',
+                'rejected': 'filterRejectedBtn'
             };
            
             const buttonId = filterMap[filter];
@@ -1943,6 +1946,8 @@
             document.getElementById('filterAllBtn').classList.toggle('active', currentFilter === 'all');
             document.getElementById('filterPendingBtn').classList.toggle('active', currentFilter === 'pending');
             document.getElementById('filterApprovedBtn').classList.toggle('active', currentFilter === 'approved');
+            const rejBtn = document.getElementById('filterRejectedBtn');
+            if (rejBtn) rejBtn.classList.toggle('active', currentFilter === 'rejected');
         }
         function displayFilteredUsers() {
             const table = document.getElementById('usersTable');
