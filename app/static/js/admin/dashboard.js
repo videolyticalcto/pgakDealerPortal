@@ -1,3 +1,37 @@
+        // ── Approve / Reject with disable-on-click ──
+        async function handleApproveReject(btn, userId, action) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (action === 'approve' ? 'Approving...' : 'Rejecting...');
+
+            // Disable the sibling button too
+            const siblingBtn = btn.closest('div').querySelector('button:not([disabled])');
+            if (siblingBtn && siblingBtn !== btn) siblingBtn.disabled = true;
+
+            try {
+                const resp = await fetch(`/${action}/${userId}`, { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json' } });
+                const data = await resp.json().catch(() => ({}));
+                if (resp.ok && data.status === 'success') {
+                    showNotification('success', data.message || (action === 'approve' ? '✓ User approved' : '✕ User rejected'));
+                    setTimeout(() => {
+                        loadUsersData().then(() => { renderUsers(currentFilter || 'pending'); });
+                        loadDashboardData();
+                    }, 500);
+                } else {
+                    showNotification('error', data.message || 'Action failed');
+                    btn.disabled = false;
+                    btn.innerHTML = origText;
+                    if (siblingBtn && siblingBtn !== btn) siblingBtn.disabled = false;
+                }
+            } catch (e) {
+                showNotification('error', 'Network error: ' + e.message);
+                btn.disabled = false;
+                btn.innerHTML = origText;
+                if (siblingBtn && siblingBtn !== btn) siblingBtn.disabled = false;
+            }
+        }
+
         const API_BASE = '/api';
         const qrVideo = document.getElementById("qrVideo");
         const qrCanvas = document.createElement("canvas");
@@ -1597,12 +1631,8 @@
                         </div>
                         ${(user.status || '').toLowerCase() === 'pending' ? `
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                <form method="POST" action="/approve/${user.user_id}" style="flex: 1;">
-                                    <button type="submit" class="details-btn" style="width: 100%; background: var(--success); justify-content: center;">✓ Approve</button>
-                                </form>
-                                <form method="POST" action="/reject/${user.user_id}" style="flex: 1;">
-                                    <button type="submit" class="details-btn" style="width: 100%; background: var(--danger); justify-content: center;">✕ Reject</button>
-                                </form>
+                                <button onclick="handleApproveReject(this, ${user.user_id}, 'approve')" class="details-btn" style="flex: 1; background: var(--success); justify-content: center;">✓ Approve</button>
+                                <button onclick="handleApproveReject(this, ${user.user_id}, 'reject')" class="details-btn" style="flex: 1; background: var(--danger); justify-content: center;">✕ Reject</button>
                             </div>
                         ` : ''}
                     </div>
@@ -1730,12 +1760,8 @@
                         </div>
                         ${(user.status || '').toLowerCase() === 'pending' ? `
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                <form method="POST" action="/approve/${user.user_id}" style="flex: 1;">
-                                    <button type="submit" class="details-btn" style="width: 100%; background: var(--success); justify-content: center;">✓ Approve</button>
-                                </form>
-                                <form method="POST" action="/reject/${user.user_id}" style="flex: 1;">
-                                    <button type="submit" class="details-btn" style="width: 100%; background: var(--danger); justify-content: center;">✕ Reject</button>
-                                </form>
+                                <button onclick="handleApproveReject(this, ${user.user_id}, 'approve')" class="details-btn" style="flex: 1; background: var(--success); justify-content: center;">✓ Approve</button>
+                                <button onclick="handleApproveReject(this, ${user.user_id}, 'reject')" class="details-btn" style="flex: 1; background: var(--danger); justify-content: center;">✕ Reject</button>
                             </div>
                         ` : ''}
                     </div>
@@ -2030,12 +2056,8 @@
                             </div>
                             ${(user.status || '').toLowerCase() === 'pending' ? `
                                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                    <form method="POST" action="/approve/${user.user_id}" style="flex: 1;">
-                                        <button type="submit" class="details-btn" style="width: 100%; background: var(--success); justify-content: center;">✓ Approve</button>
-                                    </form>
-                                    <form method="POST" action="/reject/${user.user_id}" style="flex: 1;">
-                                        <button type="submit" class="details-btn" style="width: 100%; background: var(--danger); justify-content: center;">✕ Reject</button>
-                                </form>
+                                    <button onclick="handleApproveReject(this, ${user.user_id}, 'approve')" class="details-btn" style="flex: 1; background: var(--success); justify-content: center;">✓ Approve</button>
+                                    <button onclick="handleApproveReject(this, ${user.user_id}, 'reject')" class="details-btn" style="flex: 1; background: var(--danger); justify-content: center;">✕ Reject</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -3288,16 +3310,8 @@
                     </div>
                 ${(user.status || '').toLowerCase() === 'pending' ? `
                     <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <form method="POST" action="/approve/${user.user_id}" style="flex: 1;">
-                            <button type="submit" class="details-btn" style="width: 100%; background: var(--success); justify-content: center;">
-                                ✓ Approve
-                            </button>
-                        </form>
-                        <form method="POST" action="/reject/${user.user_id}" style="flex: 1;">
-                            <button type="submit" class="details-btn" style="width: 100%; background: var(--danger); justify-content: center;">
-                                ✕ Reject
-                            </button>
-                        </form>
+                        <button onclick="handleApproveReject(this, ${user.user_id}, 'approve')" class="details-btn" style="flex: 1; background: var(--success); justify-content: center;">✓ Approve</button>
+                        <button onclick="handleApproveReject(this, ${user.user_id}, 'reject')" class="details-btn" style="flex: 1; background: var(--danger); justify-content: center;">✕ Reject</button>
                     </div>
                 ` : ''}
             `;
@@ -3382,12 +3396,8 @@
                             </div>
                             ${(user.status || '').toLowerCase() === 'pending' ? `
                                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                    <form method="POST" action="/approve/${user.user_id}" style="flex: 1;">
-                                        <button type="submit" class="details-btn" style="width: 100%; background: var(--success); justify-content: center;">✓ Approve</button>
-                                    </form>
-                                    <form method="POST" action="/reject/${user.user_id}" style="flex: 1;">
-                                        <button type="submit" class="details-btn" style="width: 100%; background: var(--danger); justify-content: center;">✕ Reject</button>
-                                    </form>
+                                    <button onclick="handleApproveReject(this, ${user.user_id}, 'approve')" class="details-btn" style="flex: 1; background: var(--success); justify-content: center;">✓ Approve</button>
+                                    <button onclick="handleApproveReject(this, ${user.user_id}, 'reject')" class="details-btn" style="flex: 1; background: var(--danger); justify-content: center;">✕ Reject</button>
                                 </div>
                             ` : ''}
                         </div>

@@ -665,6 +665,8 @@ def admin_pending():
 
 @admin_bp.route("/approve/<int:user_id>", methods=["POST"])
 def approve_dealer(user_id):
+    is_ajax = request.accept_mimetypes.best == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     # 1) Update status
     update_user_status(user_id, "Approved")
 
@@ -672,6 +674,8 @@ def approve_dealer(user_id):
     info = get_user_signup_details(user_id)
     if not info:
         logger.warning("approve: user_id %s not found in user_signups", user_id)
+        if is_ajax:
+            return jsonify({"status": "error", "message": "User not found"}), 404
         return redirect(url_for("admin.dashboard"))
 
     # 3) Send email
@@ -680,7 +684,6 @@ def approve_dealer(user_id):
         utype = (info["user_type"].strip().lower() or "user")
         subject = "PGAK Account Approved"
 
-        # Get the respective code based on user type
         if info["user_type"] == "dealer":
             code = info["dealer_code"]
         else:
@@ -700,11 +703,15 @@ def approve_dealer(user_id):
     except Exception as e:
         logger.exception("approve: email failed for user_id=%s, err=%s", user_id, e)
 
+    if is_ajax:
+        return jsonify({"status": "success", "message": "User approved successfully"}), 200
     return redirect(url_for("admin.dashboard"))
 
 
 @admin_bp.route("/reject/<int:user_id>", methods=["POST"])
 def reject_dealer(user_id):
+    is_ajax = request.accept_mimetypes.best == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     # 1) Update status
     update_user_status(user_id, "Rejected")
 
@@ -712,6 +719,8 @@ def reject_dealer(user_id):
     info = get_user_signup_details(user_id)
     if not info:
         logger.warning("reject: user_id %s not found in user_signups", user_id)
+        if is_ajax:
+            return jsonify({"status": "error", "message": "User not found"}), 404
         return redirect(url_for("admin.dashboard"))
 
     # 3) Send email
@@ -720,7 +729,6 @@ def reject_dealer(user_id):
         utype = (info["user_type"].strip().lower() or "user")
         subject = "PGAK Account Rejected"
 
-        # Get the respective code based on user type
         if info["user_type"] == "dealer":
             code = info["dealer_code"]
         else:
@@ -739,6 +747,8 @@ def reject_dealer(user_id):
     except Exception as e:
         logger.exception("reject: email failed for user_id=%s, err=%s", user_id, e)
 
+    if is_ajax:
+        return jsonify({"status": "success", "message": "User rejected successfully"}), 200
     return redirect(url_for("admin.dashboard"))
 
 
