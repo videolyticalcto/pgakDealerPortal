@@ -91,6 +91,7 @@ def send_email_otp(to_email: str, otp: str, otp_valid_minutes: int = 5) -> bool:
 
         if SMTP_CONFIG["skip_hostname_verify"]:
             context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
 
         if port == 465:
             with smtplib.SMTP_SSL(host, port, timeout=20, context=context) as server:

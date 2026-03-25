@@ -14,7 +14,7 @@ from app.blueprints.admin import admin_bp
 from app.config import Config
 from app.extensions import pwd_context
 from app.utils.email import send_email
-from app.utils.helpers import get_unique_code
+from app.utils.helpers import get_unique_code, validate_password
 
 logger = logging.getLogger(__name__)
 
@@ -385,11 +385,12 @@ def create_user():
                 "message": "Passwords do not match"
             }), 400
 
-        # Validation: Password Length
-        if len(password) < 8:
+        # Validation: Password Strength
+        pwd_error = validate_password(password)
+        if pwd_error:
             return jsonify({
                 "status": "error",
-                "message": "Password must be at least 8 characters long"
+                "message": pwd_error
             }), 400
 
         # Validation: Email Format

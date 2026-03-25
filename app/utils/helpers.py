@@ -60,6 +60,26 @@ def get_unique_code(user_type, cur, max_attempts=5):
     return None
 
 
+# ── Password validation ───────────────────────────────────────────────────
+
+def validate_password(password: str) -> str | None:
+    """
+    Validate password strength. Returns error message or None if valid.
+    Requirements: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char.
+    """
+    if len(password) < 8:
+        return "Password must be at least 8 characters long"
+    if not re.search(r'[A-Z]', password):
+        return "Password must contain at least one uppercase letter"
+    if not re.search(r'[a-z]', password):
+        return "Password must contain at least one lowercase letter"
+    if not re.search(r'[0-9]', password):
+        return "Password must contain at least one number"
+    if not re.search(r'[!@#$%^&*()_+\-=\[\]{};\':\"\\|,.<>\/?`~]', password):
+        return "Password must contain at least one special character"
+    return None
+
+
 # ── Password verification ──────────────────────────────────────────────────
 
 def verify_password(plain_password, hashed_password):

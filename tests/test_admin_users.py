@@ -22,8 +22,8 @@ class TestCreateUser:
         "company_name": "Dealer Corp",
         "gst_no": "GST12345",
         "pincode": "110001",
-        "password": "securepass123",
-        "confirm_password": "securepass123",
+        "password": "Secure@123",
+        "confirm_password": "Secure@123",
     }
 
     VALID_DISTRIBUTOR_DATA = {
@@ -35,8 +35,8 @@ class TestCreateUser:
         "company_name": "Dist Inc",
         "gst_no": "GST67890",
         "pincode": "400001",
-        "password": "securepass456",
-        "confirm_password": "securepass456",
+        "password": "Secure@456",
+        "confirm_password": "Secure@456",
     }
 
     # ── Auth ──────────────────────────────────────────────────────────────

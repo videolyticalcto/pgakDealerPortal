@@ -2436,6 +2436,10 @@
                 if (!formData.pincode) { showNotification('error', 'Pincode is required'); resetBtn(); return; }
                 if (!formData.password) { showNotification('error', 'Password is required'); resetBtn(); return; }
                 if (formData.password.length < 8) { showNotification('error', 'Password must be at least 8 characters long'); resetBtn(); return; }
+                if (!/[A-Z]/.test(formData.password)) { showNotification('error', 'Password must contain at least one uppercase letter'); resetBtn(); return; }
+                if (!/[a-z]/.test(formData.password)) { showNotification('error', 'Password must contain at least one lowercase letter'); resetBtn(); return; }
+                if (!/[0-9]/.test(formData.password)) { showNotification('error', 'Password must contain at least one number'); resetBtn(); return; }
+                if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(formData.password)) { showNotification('error', 'Password must contain at least one special character'); resetBtn(); return; }
                 if (formData.password !== formData.confirm_password) { showNotification('error', 'Passwords do not match'); resetBtn(); return; }
 
                 // Disable submit button to prevent duplicate submissions

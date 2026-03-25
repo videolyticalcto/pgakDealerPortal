@@ -25,6 +25,7 @@ from app.utils.helpers import (
     code_exists_in_db,
     get_unique_code,
     verify_password,
+    validate_password,
     is_valid_email,
 )
 
@@ -337,8 +338,9 @@ def signup():
     if password != confirm_password:
         return jsonify({"status": "error", "message": "Passwords do not match."}), 400
 
-    if len(password) < 8:
-        return jsonify({"status": "error", "message": "Password must be at least 8 characters long."}), 400
+    pwd_error = validate_password(password)
+    if pwd_error:
+        return jsonify({"status": "error", "message": pwd_error}), 400
 
     hashed_password = pwd_context.hash(password)
 

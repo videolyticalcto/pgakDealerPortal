@@ -336,6 +336,16 @@
         }
 
         const form = document.getElementById('dealer-signup-form');
+        const pwd = (document.getElementById('dealer_password') || {}).value || '';
+        const confirmPwd = (document.getElementById('dealer_confirm_password') || {}).value || '';
+
+        if (pwd !== confirmPwd) { alert('Passwords do not match'); return; }
+        if (pwd.length < 8) { alert('Password must be at least 8 characters long'); return; }
+        if (!/[A-Z]/.test(pwd)) { alert('Password must contain at least one uppercase letter'); return; }
+        if (!/[a-z]/.test(pwd)) { alert('Password must contain at least one lowercase letter'); return; }
+        if (!/[0-9]/.test(pwd)) { alert('Password must contain at least one number'); return; }
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pwd)) { alert('Password must contain at least one special character'); return; }
+
         const submitBtn = form.querySelector('button[type="submit"]');
 
         submitBtn.disabled = true;
