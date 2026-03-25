@@ -174,7 +174,7 @@ def api_dealer_customers():
             print(f"Fetching fresh access token for {dealer_email}...")
 
             try:
-                login_url = "https://api.pgak.co.in/auth/login"
+                login_url = Config.EXTERNAL_AUTH_LOGIN
                 login_payload = {
                     "email": dealer_email,
                     "password": dealer_password,
@@ -225,7 +225,7 @@ def api_dealer_customers():
         print(f"Using token: {access_token[:50]}...")
 
         # Fetch customers
-        customers_url = "https://api.pgak.co.in/auth/dealer/customers"
+        customers_url = Config.EXTERNAL_DEALER_CUSTOMERS
 
         print(f"Calling external API: {customers_url}")
 

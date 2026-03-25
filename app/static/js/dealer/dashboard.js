@@ -109,7 +109,7 @@
                     rtsp_urls: rtspUrls
                 };
                 console.log('📤 Sending to Analytics API:', payload);
-                const response = await fetch('https://api.pgak.co.in/analytics/devices2', {
+                const response = await fetch((window.PGAK_CONFIG && window.PGAK_CONFIG.EXTERNAL_DEVICES2) || 'https://api.pgak.co.in/analytics/devices2', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -380,7 +380,7 @@
                     // Find original index in full devices array for analytics lookup
                     const originalIndex = devices.indexOf(device);
                     const ip = d.device_ip || d.ip || d.ip_address || d.address || d.host || 'N/A';
-                    const snapshot = device.screenshot_path || device.image_url || (device.device_ip || device.ip) ? `https://dealer.pgak.co.in/images/${device.device_ip || device.ip}_jpg` : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
+                    const snapshot = device.screenshot_path || device.image_url || (device.device_ip || device.ip) ? `${(window.PGAK_CONFIG && window.PGAK_CONFIG.BASE_IMAGE_API) || 'https://dealer.pgak.co.in/images/'}${device.device_ip || device.ip}_jpg` : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
                     const serial = device.device_info?.SerialNumber || `Device-${filteredIndex}`;
                     const deviceKey = `device-${filteredIndex}`;
                     
@@ -4122,7 +4122,7 @@ function dpv2RenderDevices(devices) {
 
         // ✅ EXACT SAME URL as old modal - operator precedence ensures https:// always used
         const snapshot = d.screenshot_path || d.image_url || (d.device_ip || d.ip)
-            ? `https://dealer.pgak.co.in/images/${ip}_jpg`
+            ? `${(window.PGAK_CONFIG && window.PGAK_CONFIG.BASE_IMAGE_API) || 'https://dealer.pgak.co.in/images/'}${ip}_jpg`
             : null;
 
         const card = document.createElement('div');

@@ -206,7 +206,7 @@ def login():
                         try:
                             print(f"Getting initial access token for dealer: {email}")
 
-                            external_login_url = "https://api.pgak.co.in/auth/login"
+                            external_login_url = Config.EXTERNAL_AUTH_LOGIN
                             external_login_payload = {
                                 "email": email,
                                 "password": password,
@@ -433,7 +433,7 @@ def signup():
                     # Call external API to get dealer_code
                     address = request.form.get("address", company_name).strip()
 
-                    external_api_url = "https://api.pgak.co.in/auth/dealer/signup"
+                    external_api_url = Config.EXTERNAL_DEALER_SIGNUP
                     external_api_payload = {
                         "username": full_name,
                         "email": email,

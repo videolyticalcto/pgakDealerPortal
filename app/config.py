@@ -53,5 +53,15 @@ class Config:
     # Image
     BASE_IMAGE_API = os.getenv("BASE_IMAGE_API", "")
 
+    # External API URLs
+    EXTERNAL_API_BASE = os.getenv("EXTERNAL_API_BASE", "https://api.pgak.co.in")
+    EXTERNAL_AUTH_LOGIN = os.getenv("EXTERNAL_AUTH_LOGIN", "https://api.pgak.co.in/auth/login")
+    EXTERNAL_DEALER_SIGNUP = os.getenv("EXTERNAL_DEALER_SIGNUP", "https://api.pgak.co.in/auth/dealer/signup")
+    EXTERNAL_DEALER_CUSTOMERS = os.getenv("EXTERNAL_DEALER_CUSTOMERS", "https://api.pgak.co.in/auth/dealer/customers")
+    EXTERNAL_USER_PURCHASES = os.getenv("EXTERNAL_USER_PURCHASES", "https://api.pgak.co.in/analytics/user-purchases2")
+    EXTERNAL_FRS_INSERT = os.getenv("EXTERNAL_FRS_INSERT", "https://api.pgak.co.in/analytics/frs_insert")
+    EXTERNAL_INSERT_ANALYTICS = os.getenv("EXTERNAL_INSERT_ANALYTICS", "https://api.pgak.co.in/analytics/insert_analytics")
+    EXTERNAL_DEVICES2 = os.getenv("EXTERNAL_DEVICES2", "https://api.pgak.co.in/analytics/devices2")
+
     # Offline timeout
     OFFLINE_TIMEOUT = 30

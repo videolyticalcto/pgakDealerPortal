@@ -322,7 +322,7 @@
                     rtsp_urls: rtspUrls
                 };
                 console.log('📤 Sending to Analytics API:', payload);
-                const response = await fetch('https://api.pgak.co.in/analytics/devices2', {
+                const response = await fetch((window.PGAK_CONFIG && window.PGAK_CONFIG.EXTERNAL_DEVICES2) || 'https://api.pgak.co.in/analytics/devices2', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -693,7 +693,7 @@
             try {
                 console.log("📊 Loading analytics for user:", userId);
                 
-                const response = await fetch(`https://api.pgak.co.in/analytics/user-purchases2?user_id=${userId}`);
+                const response = await fetch(`${(window.PGAK_CONFIG && window.PGAK_CONFIG.EXTERNAL_USER_PURCHASES) || 'https://api.pgak.co.in/analytics/user-purchases2'}?user_id=${userId}`);
                 const data = await response.json();
                 
                 console.log("✅ Analytics data loaded:", data);
@@ -1625,7 +1625,7 @@
         async function loadUsersByType(userType) {
             try {
                 const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MDYzMjc1NiwianRpIjoiMzRkNmM1ODUtODkxMS00ZTE4LWFmZWEtOTdiZWJhYTQ2N2RiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjE0NCIsIm5iZiI6MTc3MDYzMjc1NiwiZXhwIjoxNzcwNjM2MzU2fQ.jjRC4qdBIrPlWB5xACAMGOVJrxcsYCnldhY49sDcBxo';
-                const endpoint = userType === 'dealer' ? '/distributor/dealers' : 'https://api.pgak.co.in/auth/dealer/customers';
+                const endpoint = userType === 'dealer' ? '/distributor/dealers' : ((window.PGAK_CONFIG && window.PGAK_CONFIG.EXTERNAL_DEALER_CUSTOMERS) || 'https://api.pgak.co.in/auth/dealer/customers');
                 
                 const fetchOptions = {
                     method: 'GET',

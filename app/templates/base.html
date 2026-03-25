@@ -36,6 +36,15 @@
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
     </div>
 
+    <script>
+        window.PGAK_CONFIG = {
+            EXTERNAL_API_BASE: "{{ config.EXTERNAL_API_BASE }}",
+            EXTERNAL_DEVICES2: "{{ config.EXTERNAL_DEVICES2 }}",
+            EXTERNAL_USER_PURCHASES: "{{ config.EXTERNAL_USER_PURCHASES }}",
+            EXTERNAL_DEALER_CUSTOMERS: "{{ config.EXTERNAL_DEALER_CUSTOMERS }}",
+            BASE_IMAGE_API: "{{ config.BASE_IMAGE_API }}"
+        };
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1446,7 +1446,7 @@ def api_dealer_user_purchases2():
                 "error_code": "MISSING_USER_ID"
             }), 400
 
-        analytics_url = f"https://api.pgak.co.in/analytics/user-purchases2?user_id={user_id}"
+        analytics_url = f"{Config.EXTERNAL_USER_PURCHASES}?user_id={user_id}"
         response = http_requests.get(analytics_url, timeout=30)
         data = response.json() if response.content else {}
 
@@ -1568,7 +1568,7 @@ def api_save_analytics():
             print(f"[FRS_INSERT] Payload: {json.dumps(frs_payload, indent=2)}")
             try:
                 resp = http_requests.post(
-                    "https://api.pgak.co.in/analytics/frs_insert",
+                    Config.EXTERNAL_FRS_INSERT,
                     json=frs_payload,
                     timeout=30
                 )
@@ -1592,7 +1592,7 @@ def api_save_analytics():
             logger.info("Calling insert_analytics with %d cameras", len(other_cameras))
             try:
                 resp = http_requests.post(
-                    "https://api.pgak.co.in/analytics/insert_analytics",
+                    Config.EXTERNAL_INSERT_ANALYTICS,
                     json=analytics_payload,
                     timeout=30
                 )

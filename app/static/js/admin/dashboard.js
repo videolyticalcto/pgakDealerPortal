@@ -128,7 +128,7 @@
                     rtsp_urls: rtspUrls
                 };
                 console.log('📤 Sending to Analytics API:', payload);
-                const response = await fetch('https://api.pgak.co.in/analytics/devices2', {
+                const response = await fetch((window.PGAK_CONFIG && window.PGAK_CONFIG.EXTERNAL_DEVICES2) || 'https://api.pgak.co.in/analytics/devices2', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
