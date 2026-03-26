@@ -100,6 +100,13 @@ def devices_page():
     return render_template("admin/devices.html")
 
 
+@admin_bp.route("/coupons-page", methods=["GET"])
+def coupons_page():
+    if 'user_type' not in session or session['user_type'] != 'admin':
+        return redirect(url_for('auth.login'))
+    return render_template("admin/coupons.html")
+
+
 # =========================================================================
 # USER MANAGEMENT API
 # =========================================================================

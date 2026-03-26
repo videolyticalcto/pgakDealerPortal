@@ -96,6 +96,8 @@
                 });
             } else if (currentPath.indexOf('/devices-page') !== -1) {
                 loadDevicesData();
+            } else if (currentPath.indexOf('/coupons-page') !== -1) {
+                // Coupons page - JS is handled in the template itself
             } else if (currentPath.indexOf('/discovery-page') !== -1) {
                 // discovery page init - no data loader needed
             } else {

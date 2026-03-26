@@ -1,0 +1,350 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1 class="header-title">Coupon Management</h1>
+            <p class="header-subtitle">Create and manage discount coupons</p>
+        </div>
+    </div>
+</header>
+<div class="content" id="content">
+    <div id="couponsView">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-900); margin: 0;">Coupons</h3>
+            </div>
+            <button class="btn btn-primary" onclick="openAddCouponModal()">
+                <i class="fas fa-plus"></i>
+                Add Coupon
+            </button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Campaign</th>
+                        <th>Description</th>
+                        <th>Discount %</th>
+                        <th>Usage</th>
+                        <th>Remaining</th>
+                        <th>Expires At</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="couponsTableBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--gray-500);">Loading coupons...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="couponsPagination" style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 20px;">
+        </div>
+    </div>
+</div>
+
+<!-- Add Coupon Modal -->
+<div id="addCouponModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-tag"></i> Add New Coupon</h2>
+            <button class="modal-close" onclick="closeAddCouponModal()">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addCouponForm">
+                <div class="form-group">
+                    <label>Campaign Name *</label>
+                    <input type="text" id="couponCampaignName" placeholder="e.g. NEW_YEAR" required style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" id="couponDescription" placeholder="e.g. New Year Offer" required>
+                </div>
+                <div class="form-group">
+                    <label>Discount Percent *</label>
+                    <input type="number" id="couponDiscountPercent" placeholder="e.g. 15" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Expires In (Days) *</label>
+                    <input type="number" id="couponExpiresInDays" placeholder="e.g. 10" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Unlimited *</label>
+                    <select id="couponUnlimited" required onchange="toggleUsageLimit()">
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="form-group" id="usageLimitGroup" style="display: none;">
+                    <label>Usage Limit *</label>
+                    <input type="number" id="couponUsageLimit" placeholder="e.g. 100" min="1">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-check"></i> Create Coupon
+                    </button>
+                    <button type="button" class="modal-btn secondary" onclick="closeAddCouponModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Pagination */
+    #couponsPagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    .pg-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--gray-300);
+        background: white;
+        color: var(--gray-700);
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .pg-btn:hover:not(:disabled):not(.pg-active) {
+        background: var(--gray-100);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .pg-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .pg-btn.pg-active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    .pg-dots {
+        padding: 0 4px;
+        color: var(--gray-500);
+        font-weight: 600;
+    }
+    .pg-info {
+        font-size: 13px;
+        color: var(--gray-500);
+        font-weight: 600;
+        margin-right: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin/dashboard.js"></script>
+<script>
+    const ANALYTICS_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? `http://localhost:5006`
+        : 'https://api.pgak.co.in';
+    const COUPONS_API = `${ANALYTICS_BASE}/analytics/coupons`;
+    const GENERATE_COUPON_API = `${ANALYTICS_BASE}/analytics/generate-coupon`;
+
+    let couponsCurrentPage = 1;
+    const couponsLimit = 10;
+
+    let couponsTotalPages = 1;
+    let couponsTotalCount = 0;
+
+    async function loadCoupons(page) {
+        if (page < 1) return;
+        couponsCurrentPage = page;
+        const tbody = document.getElementById('couponsTableBody');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--gray-500);"><i class="fas fa-spinner fa-spin"></i> Loading coupons...</td></tr>';
+
+        try {
+            const response = await fetch(`${COUPONS_API}?page=${couponsCurrentPage}&limit=${couponsLimit}`);
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Failed to fetch coupons');
+            }
+
+            const data = await response.json();
+            const coupons = data.coupons || [];
+            const total = data.total || 0;
+            couponsTotalPages = Math.ceil(total / couponsLimit) || 1;
+            couponsTotalCount = total;
+
+            renderCouponsTable(coupons);
+            renderCouponsPagination(couponsCurrentPage, couponsTotalPages, couponsTotalCount);
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--danger);">Error: ${error.message}</td></tr>`;
+            document.getElementById('couponsPagination').innerHTML = '';
+        }
+    }
+
+    function renderCouponsTable(coupons) {
+        const tbody = document.getElementById('couponsTableBody');
+
+        if (!coupons.length) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--gray-500);">No coupons found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = coupons.map(c => {
+            const isUnlimited = c.usage_limit === null;
+            const statusMap = {
+                'valid': { cls: 'success', text: 'Active' },
+                'expired': { cls: 'danger', text: 'Expired' },
+                'exhausted': { cls: 'warning', text: 'Exhausted' }
+            };
+            const status = statusMap[c.validity_status] || { cls: c.is_expired ? 'danger' : 'success', text: c.is_expired ? 'Expired' : 'Active' };
+            const expiresAt = c.expires_at ? new Date(c.expires_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+            const usageText = isUnlimited
+                ? `${c.usage_count || 0} (Unlimited)`
+                : `${c.usage_count || 0} / ${c.usage_limit}`;
+
+            return `<tr>
+                <td data-label="Code"><strong style="font-family: monospace; font-size: 13px;">${c.code || '-'}</strong></td>
+                <td data-label="Campaign">${c.campaign_name || '-'}</td>
+                <td data-label="Description">${c.description || '-'}</td>
+                <td data-label="Discount %"><span style="font-weight: 600; color: var(--primary);">${c.discount_percent != null ? c.discount_percent + '%' : '-'}</span></td>
+                <td data-label="Usage">${usageText}</td>
+                <td data-label="Remaining">${c.remaining_uses != null ? c.remaining_uses : 'Unlimited'}</td>
+                <td data-label="Expires At">${expiresAt}</td>
+                <td data-label="Status"><span style="background: var(--${status.cls}); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block;">${status.text}</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function renderCouponsPagination(current, totalPages, totalCount) {
+        const container = document.getElementById('couponsPagination');
+        if (totalPages <= 1) {
+            container.innerHTML = totalCount
+                ? `<span class="pg-info">${totalCount} coupon${totalCount !== 1 ? 's' : ''}</span>`
+                : '';
+            return;
+        }
+
+        let html = '';
+
+        // Total count info
+        if (totalCount) {
+            html += `<span class="pg-info">${totalCount} coupons</span>`;
+        }
+
+        // Prev button
+        html += `<button class="pg-btn" onclick="loadCoupons(${current - 1})" ${current === 1 ? 'disabled' : ''}>&laquo;</button>`;
+
+        // Page numbers with ellipsis
+        const pages = [];
+        const delta = 2;
+        const left = Math.max(2, current - delta);
+        const right = Math.min(totalPages - 1, current + delta);
+
+        pages.push(1);
+        if (left > 2) pages.push('...');
+        for (let i = left; i <= right; i++) pages.push(i);
+        if (right < totalPages - 1) pages.push('...');
+        if (totalPages > 1) pages.push(totalPages);
+
+        pages.forEach(p => {
+            if (p === '...') {
+                html += `<span class="pg-dots">...</span>`;
+            } else {
+                html += `<button class="pg-btn${p === current ? ' pg-active' : ''}" onclick="loadCoupons(${p})">${p}</button>`;
+            }
+        });
+
+        // Next button
+        html += `<button class="pg-btn" onclick="loadCoupons(${current + 1})" ${current === totalPages ? 'disabled' : ''}>&raquo;</button>`;
+
+        container.innerHTML = html;
+    }
+
+    function openAddCouponModal() {
+        document.getElementById('addCouponModal').classList.add('show');
+        document.getElementById('couponCampaignName').focus();
+    }
+
+    function toggleUsageLimit() {
+        const isUnlimited = document.getElementById('couponUnlimited').value === 'true';
+        const group = document.getElementById('usageLimitGroup');
+        const input = document.getElementById('couponUsageLimit');
+        group.style.display = isUnlimited ? 'none' : 'block';
+        input.required = !isUnlimited;
+        if (isUnlimited) input.value = '';
+    }
+
+    function closeAddCouponModal() {
+        document.getElementById('addCouponModal').classList.remove('show');
+        document.getElementById('addCouponForm').reset();
+        document.getElementById('couponUnlimited').value = 'true';
+        toggleUsageLimit();
+    }
+
+    document.getElementById('addCouponForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const isUnlimited = document.getElementById('couponUnlimited').value === 'true';
+
+        if (!isUnlimited && !document.getElementById('couponUsageLimit').value) {
+            showNotification('error', 'Usage Limit is required when Unlimited is No');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const origText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+        const payload = {
+            campaign_name: document.getElementById('couponCampaignName').value.trim().toUpperCase(),
+            description: document.getElementById('couponDescription').value.trim(),
+            discount_percent: parseInt(document.getElementById('couponDiscountPercent').value, 10),
+            expires_in_days: parseInt(document.getElementById('couponExpiresInDays').value, 10)
+        };
+
+        if (isUnlimited) {
+            payload.unlimited = true;
+        } else {
+            payload.usage_limit = parseInt(document.getElementById('couponUsageLimit').value, 10);
+        }
+
+        try {
+            const response = await fetch(GENERATE_COUPON_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                showNotification('success', data.message || 'Coupon created successfully');
+                closeAddCouponModal();
+                loadCoupons(1);
+            } else {
+                showNotification('error', data.message || 'Failed to create coupon');
+            }
+        } catch (error) {
+            showNotification('error', 'Network error: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origText;
+        }
+    });
+
+    // Load coupons on page load
+    loadCoupons(1);
+</script>
+{% endblock %}
