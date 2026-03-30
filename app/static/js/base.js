@@ -54,36 +54,58 @@ function displayUserProfile(user) {
 function setupMobileMenu() {
     const toggle = document.getElementById('mobileToggle');
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
+    const overlay =
+        document.getElementById('mobileOverlay') ||
+        document.getElementById('sidebarOverlay');
 
-    function closeSidebar() {
+    if (!toggle || !sidebar || !overlay) return;
+
+    if (toggle.dataset.mobileMenuBound === 'true') return;
+    toggle.dataset.mobileMenuBound = 'true';
+
+    function closeSidebarInner() {
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
     }
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isOpening = !sidebar.classList.contains('active');
         sidebar.classList.toggle('active');
         overlay.classList.toggle('active');
+
+        if (isOpening) {
+            document.body.classList.add('sidebar-open');
+        } else {
+            document.body.classList.remove('sidebar-open');
+        }
     });
 
-    overlay.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebarInner);
 
     document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', closeSidebar);
+        item.addEventListener('click', closeSidebarInner);
     });
 
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            closeSidebar();
+            closeSidebarInner();
         }
     });
 }
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
+    const overlay =
+        document.getElementById('mobileOverlay') ||
+        document.getElementById('sidebarOverlay');
+
     if (sidebar) sidebar.classList.remove('active');
     if (overlay) overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
 }
 
 function showNotification(type, message) {
