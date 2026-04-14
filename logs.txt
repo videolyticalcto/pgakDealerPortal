@@ -1,202 +1,864 @@
-(env) PS D:\najmus\pgak> python .\main.py
- * Serving Flask app 'app'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on all addresses (0.0.0.0)
- * Running on https://127.0.0.1:5002
- * Running on https://192.168.1.241:5002
-Press CTRL+C to quit
-192.168.1.6 - - [13/Apr/2026 13:16:18] "GET / HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:19] "GET /static/css/auth.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:19] "GET /static/js/auth.js HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:19] "GET /static/images/logo_dealer.jpeg HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:30] "GET / HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:30] "GET /static/css/auth.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:30] "GET /static/js/auth.js HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:30] "GET /static/images/logo_dealer.jpeg HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:30] "GET /favicon.ico HTTP/1.1" 404 -
-192.168.1.6 - - [13/Apr/2026 13:16:37] "POST /login HTTP/1.1" 401 -
-192.168.1.6 - - [13/Apr/2026 13:16:44] "POST /login HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:44] "GET /admin/dashboard HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /static/css/components.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /static/css/admin.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /static/css/base.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /static/js/admin/dashboard.js HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /admin/users HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:45] "GET /devices_status?filter=all HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /admin/devices-page HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /static/css/components.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /static/css/admin.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /static/css/base.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /static/js/admin/dashboard.js HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:16:47] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:48] "GET /devices_status?filter=online HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:16:48] "GET /devices_status?filter=online HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:02] "GET /admin/users HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:19] "POST /api/validate-device-serial HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:19] "POST /api/devices/save-from-qr HTTP/1.1" 201 -
-192.168.1.6 - - [13/Apr/2026 13:17:42] "POST /login HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:42] "GET /dealer/dashboard HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:42] "GET /static/css/components.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:42] "GET /static/css/dealer.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /static/css/base.css HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /static/js/dealer/dashboard.js HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /api/dealer-code HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /api/dealer/customers HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:43] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:44] "GET /dealer/devices?dealer_id=89&filter=all HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:48] "GET /dealer/devices-page HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:48] "GET /static/css/components.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:17:48] "GET /static/css/dealer.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:17:48] "GET /static/css/base.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:17:48] "GET /static/js/dealer/dashboard.js HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:17:49] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:49] "GET /api/dealer-code HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:49] "GET /api/current-user HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:50] "GET /dealer/devices?dealer_id=89&filter=online HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:17:53] "GET /api/dealer/customers HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:18:01] "POST /api/validate-device-serial HTTP/1.1" 200 -
-192.168.1.6 - - [13/Apr/2026 13:18:01] "POST /api/devices/save-from-qr-v2 HTTP/1.1" 201 -
-[DEBUG] Registered routes: 91
-  /static/<path:filename> -> static [HEAD,OPTIONS,GET]
-  / -> auth.index [HEAD,OPTIONS,GET]
-  /login -> auth.login [GET,HEAD,OPTIONS,POST]
-  /logout -> auth.logout [HEAD,OPTIONS,GET]
-  /signup -> auth.signup [OPTIONS,POST]
-  /send-otp -> auth.send_otp [OPTIONS,POST]
-  /verify-otp -> auth.verify_otp [OPTIONS,POST]
-  /send-otp-email -> auth.send_otp_email_route [OPTIONS,POST]
-  /verify-otp-email -> auth.verify_otp_email [OPTIONS,POST]
-  /api/current-user -> auth.api_current_user [HEAD,OPTIONS,GET]
-  /api/pincode-lookup -> auth.pincode_lookup [OPTIONS,POST]
-  /api/pincode-details -> auth.pincode_details [OPTIONS,POST]
-  /admin/dashboard -> admin.dashboard [HEAD,OPTIONS,GET]
-  /admin/users-page -> admin.users_page [HEAD,OPTIONS,GET]
-  /admin/devices-page -> admin.devices_page [HEAD,OPTIONS,GET]
-  /admin/coupons-page -> admin.coupons_page [HEAD,OPTIONS,GET]
-  /admin/users -> admin.admin_users [HEAD,OPTIONS,GET]
-  /admin/users/<int:user_id> -> admin.edit_user [PUT,OPTIONS]
-  /admin/users/<int:user_id> -> admin.delete_user [DELETE,OPTIONS]
-  /admin/users -> admin.create_user [OPTIONS,POST]
-  /admin/pending -> admin.admin_pending [HEAD,OPTIONS,GET]
-  /admin/approve/<int:user_id> -> admin.approve_dealer [OPTIONS,POST]
-  /admin/reject/<int:user_id> -> admin.reject_dealer [OPTIONS,POST]
-  /admin/dealer-codes -> admin.admin_dealer_codes [HEAD,OPTIONS,GET]
-  /admin/distributor-codes -> admin.admin_distributor_codes [HEAD,OPTIONS,GET]
-  /admin/regenerate-code/<user_type>/<int:user_id> -> admin.regenerate_code [OPTIONS,POST]
-  /dealer/dashboard -> dealer.dashboard [HEAD,OPTIONS,GET]
-  /dealer/customers-page -> dealer.customers_page [HEAD,OPTIONS,GET]
-  /dealer/devices-page -> dealer.devices_page [HEAD,OPTIONS,GET]
-  /dealer/discovery-page -> dealer.discovery_page [HEAD,OPTIONS,GET]
-  /dealer/analytics-page -> dealer.analytics_page [HEAD,OPTIONS,GET]
-  /dealer/api/customers -> dealer.api_dealer_customers [HEAD,OPTIONS,GET]
-  /dealer/api/code -> dealer.api_me_dealer_code [HEAD,OPTIONS,GET]
-  /dealer/api/customers-list -> dealer.get_dealer_customers [HEAD,OPTIONS,GET]
-  /dealer/api/devices-list -> dealer.api_dealer_devices [HEAD,OPTIONS,GET]
-  /distributor/dashboard -> distributor.dashboard [HEAD,OPTIONS,GET]
-  /distributor/dealers-page -> distributor.dealers_page [HEAD,OPTIONS,GET]
-  /distributor/devices-page -> distributor.devices_page [HEAD,OPTIONS,GET]
-  /distributor/api/dealers -> distributor.get_distributor_dealers [HEAD,OPTIONS,GET]
-  /distributor/api/code -> distributor.api_me_distributor_code [HEAD,OPTIONS,GET]
-  /distributor/api/devices-list -> distributor.api_distributor_devices [HEAD,OPTIONS,GET]
-  /api/validate-device-serial -> api.validate_device_serial [OPTIONS,POST]
-  /api/devices/save-from-qr -> api.save_device_qr [OPTIONS,POST]
-  /api/devices/save-from-qr-v2 -> api.save_device_qr_v2 [OPTIONS,POST]
-  /api/agents -> api.api_agents [HEAD,OPTIONS,GET]
-  /api/scan -> api.api_scan [OPTIONS,POST]
-  /api/scan_results -> api.api_scan_results [OPTIONS,POST]
-  /api/scan-db -> api.api_scan_db [OPTIONS,POST]
-  /api/static-ip-discovery -> api.static_ip_discovery [OPTIONS,POST]
-  /api/dealer/user-purchases2 -> api.api_dealer_user_purchases2 [HEAD,OPTIONS,GET]
-  /api/save-analytics -> api.api_save_analytics [OPTIONS,POST]
-  /socket-hub/agents -> devices.socket_hub_agents [HEAD,OPTIONS,GET]
-  /system_info -> devices.system_info [OPTIONS,POST]
-  /device_discovery -> devices.device_discovery [OPTIONS,POST]
-  /devices_status -> devices.api_device_status [HEAD,OPTIONS,GET]
-  /devices -> devices.devices_list [HEAD,OPTIONS,GET]
-  /snapshots/<path:filename> -> devices.serve_snapshot [HEAD,OPTIONS,GET]
-  /images/<path:filename> -> devices.images [HEAD,OPTIONS,GET]
-  /api/images/upload -> devices.upload_image [OPTIONS,POST]
-  /api/images/<ip> -> devices.get_image [HEAD,OPTIONS,GET]
-  /api/images/status/<ip> -> devices.image_status [HEAD,OPTIONS,GET]
-  /health -> devices.health [HEAD,OPTIONS,GET]
-  /api/print-serial -> devices.api_print_serial [OPTIONS,POST]
-  /api/db/analytics -> proxy.proxy_get_analytics [HEAD,OPTIONS,GET]
-  /api/db/analytics/<int:analytic_id> -> proxy.proxy_get_analytic_by_id [HEAD,OPTIONS,GET]
-  /api/db/analytics/<int:analytic_id> -> proxy.proxy_update_analytic [PUT,OPTIONS]
-  /api/db/analytics/<int:analytic_id> -> proxy.proxy_delete_analytic [DELETE,OPTIONS]
-  /api/db/devices -> proxy.proxy_get_devices [HEAD,OPTIONS,GET]
-  /api/db/devices/<int:device_id> -> proxy.proxy_update_device [PUT,OPTIONS]
-  /api/db/devices/<int:device_id> -> proxy.proxy_delete_device [DELETE,OPTIONS]
-  /api/assets/health -> assets.assets_health [HEAD,OPTIONS,GET]
-  /api/assets/list-printers -> assets.api_list_printers [HEAD,OPTIONS,GET]
-  /api/assets/check-db -> assets.api_check_db [HEAD,OPTIONS,GET]
-  /api/assets/generate-and-print -> assets.api_generate_and_print [OPTIONS,POST]
-  /api/assets/online-devices -> assets.api_assets_online_devices [HEAD,OPTIONS,GET]
-  /api/assets/latest -> assets.api_assets_latest [HEAD,OPTIONS,GET]
-  /api/dealer-code -> compat.old_dealer_code [HEAD,OPTIONS,GET]
-  /api/dealer/customers -> compat.old_dealer_customers [HEAD,OPTIONS,GET]
-  /dealer/customers -> compat.old_dealer_customers_list [HEAD,OPTIONS,GET]
-  /dealer/devices -> compat.old_dealer_devices [HEAD,OPTIONS,GET]
-  /api/distributor-code -> compat.old_distributor_code [HEAD,OPTIONS,GET]
-  /distributor/dealers -> compat.old_distributor_dealers [HEAD,OPTIONS,GET]
-  /distributor/devices -> compat.old_distributor_devices [HEAD,OPTIONS,GET]
-  /admin/post-users -> compat.old_admin_post_users [OPTIONS,POST]
-  /admin/edit-users/<int:user_id> -> compat.old_admin_edit_users [PUT,OPTIONS]
-  /admin/delete-users/<int:user_id> -> compat.old_admin_delete_users [DELETE,OPTIONS]
-  /approve/<int:user_id> -> compat.old_approve [OPTIONS,POST]
-  /reject/<int:user_id> -> compat.old_reject [OPTIONS,POST]
-  /admin_dashboard -> compat.old_admin_dashboard [HEAD,OPTIONS,GET]
-  /dealer_dashboard -> compat.old_dealer_dashboard [HEAD,OPTIONS,GET]
-  /distributor_dashboard -> compat.old_distributor_dashboard [HEAD,OPTIONS,GET]
-[SSL] Running with HTTPS (cert=D:\najmus\pgak\selfsigned.crt)
-Socket hub listening on 0.0.0.0:5006
-Login successful for admin: shrivastavaaditi468@gmail.com
-Getting initial access token for dealer: najmussaqib140@gmail.com
-External API authentication successful for dealer najmussaqib140@gmail.com
-Login successful for dealer: najmussaqib140@gmail.com
+
 
 ================================================================================
-/api/customers called
-   Session user_type: dealer
-   Session user_id: 89
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
 ================================================================================
 
-Using token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6Z...
-Calling external API: https://api.pgak.co.in/auth/dealer/customers
-Response: 200
-Success! Customers: 2
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
 
 ================================================================================
-/api/customers called
-   Session user_type: dealer
-   Session user_id: 89
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
 ================================================================================
 
-Using token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6Z...
-Calling external API: https://api.pgak.co.in/auth/dealer/customers
-Response: 200
-Success! Customers: 2
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+   Still waiting for scan results... 28s elapsed
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+139.5.39.148 - - [14/Apr/2026 12:01:56] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:01:57] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:01:57] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:01] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:01] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:02] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:02] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:06] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:06] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:08] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:08] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:11] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:11] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:13] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:13] "POST /device_discovery HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:13] "POST /api/images/upload HTTP/1.1" 200 -
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+   Still waiting for scan results... 38s elapsed
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+   Still waiting for scan results... 48s elapsed
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
 
 ======================================================================
-SCAN REQUEST
+SCAN RESULTS RECEIVED FROM PI
+   Agent ID: 192.168.1.111
    Username: admin
-   Password: ********
-   Customer ID: 390
-   Customer ID type: str
-   Raw request body: {'username': 'admin', 'password': 'admin123', 'customer_id': '390'}
+   Password Hash: 7676aaafb027c825
+   Count: 11
+   user_id (top-level from Pi): None
+   user_id type: NoneType
+   Device[0] user_id: NOT SET | ip: N/A
+   Device[1] user_id: NOT SET | ip: N/A
+   Device[2] user_id: NOT SET | ip: N/A
+122.180.246.254 - - [14/Apr/2026 12:02:13] "POST /api/scan_results HTTP/1.1" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "POST /api/scan HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.101_jpg HTTP/1.0" 404 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.102_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.100_jpg HTTP/1.0" 404 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.168_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.191_jpg HTTP/1.0" 404 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.20_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.21_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.249_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.42_jpg HTTP/1.0" 404 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.77_jpg HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:15] "GET /images/192.168.1.251_jpg HTTP/1.0" 404 -
+139.5.39.148 - - [14/Apr/2026 12:02:16] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:16] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:18] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:18] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:22] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:22] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:23] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:23] "POST /device_discovery HTTP/1.1" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:24] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:25] "GET /static/css/auth.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:26] "GET /static/images/logo_dealer.jpeg HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:26] "GET /static/js/auth.js HTTP/1.0" 304 -
+139.5.39.148 - - [14/Apr/2026 12:02:27] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:27] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:28] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:28] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:32] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:32] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:33] "POST /system_info HTTP/1.1" 200 -
+   ... and 8 more devices
+   Full payload keys: ['agent_id', 'username', 'password_hash', 'count', 'devices', 'user_id']
 ======================================================================
-   Requested agent_id: ''
-   No agent_id in request - selecting verified target from AGENTS...
-   No verified agents in AGENTS dict - falling back to socket hub
-   Fallback: using socket hub agent: 192.168.1.111
-   Final agent_id: 192.168.1.111
+   Scan results stored with key: 192.168.1.111:admin:7676aaafb027c825
+======================================================================
 
-Sending scan command via socket hub to agent: 192.168.1.111
-   Data being sent to Pi: {'username': 'admin', 'password': 'admin123', 'customer_id': '390'}
-   customer_id value: 390 (type: str)
-   [SOCKET_HUB] Sending to 192.168.1.111: command=scan, data keys=['username', 'password', 'customer_id']192.168.1.6 - - [13/Apr/2026 13:18:43] "GET /static/css/base.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:18:43] "GET /static/css/components.css HTTP/1.1" 304 -
-192.168.1.6 - - [13/Apr/2026 13:18:43] "GET /static/css/dealer.css HTTP/1.1" 304 -
+   Scan results received after 52.1s (attempt #27)
+   SCAN SUCCESS! Found 11 devices
+======================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+122.180.246.254 - - [14/Apr/2026 12:02:33] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:37] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:37] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:39] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:39] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:42] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:43] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:44] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:44] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:48] "POST /system_info HTTP/1.1" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "POST /login HTTP/1.0" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:48] "POST /device_discovery HTTP/1.1" 403 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /admin/dashboard HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /static/css/base.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /static/css/components.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /static/css/admin.css HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /static/js/admin/dashboard.js HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /api/current-user HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /admin/users HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:48] "GET /devices_status?filter=all HTTP/1.0" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:49] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:49] "POST /device_discovery HTTP/1.1" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /admin/users-page HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /static/css/base.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /static/js/admin/dashboard.js HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /static/css/components.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /static/css/admin.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /api/current-user HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:50] "GET /admin/users HTTP/1.0" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:53] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:53] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:54] "POST /system_info HTTP/1.1" 200 -
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+Login successful for admin: shrivastavaaditi468@gmail.com
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 122.180.246.254 - - [14/Apr/2026 12:02:54] "POST /device_discovery HTTP/1.1" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /admin/dashboard HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /static/css/admin.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /static/css/components.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /static/css/base.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /static/js/admin/dashboard.js HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /api/current-user HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /admin/users HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:55] "GET /devices_status?filter=all HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /admin/users-page HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /static/css/components.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /static/css/admin.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /static/css/base.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /static/js/admin/dashboard.js HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /api/current-user HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:57] "GET /admin/users HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /admin/devices-page HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /static/css/base.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /static/css/admin.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /static/css/components.css HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /static/js/admin/dashboard.js HTTP/1.0" 304 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /api/current-user HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /devices_status?filter=online HTTP/1.0" 200 -
+127.0.0.1 - - [14/Apr/2026 12:02:58] "GET /devices_status?filter=online HTTP/1.0" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:58] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:02:58] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:02:59] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:02:59] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:03] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:03] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:03:04] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:03:05] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:09] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:09] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:03:10] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:03:10] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:14] "POST /system_info HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:14] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:03:15] "POST /system_info HTTP/1.1" 200 -
+---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================
+
+122.180.246.254 - - [14/Apr/2026 12:03:15] "POST /device_discovery HTTP/1.1" 200 -
+139.5.39.148 - - [14/Apr/2026 12:03:19] "POST /system_info HTTP/1.1" 200 -
+^A139.5.39.148 - - [14/Apr/2026 12:03:19] "POST /device_discovery HTTP/1.1" 403 -
+122.180.246.254 - - [14/Apr/2026 12:03:20] "POST /system_info HTTP/1.1" 200 -
+122.180.246.254 - - [14/Apr/2026 12:03:20] "POST /device_discovery HTTP/1.1" 200 -
+^C{'IP': '192.168.0.165', 'Hostname': 'raspberry01', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000c8c43e22'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.0.165
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   REJECTED: 192.168.0.165 != 192.168.1.111
+================================================================================
+
+{'IP': '192.168.1.111', 'Hostname': 'raspberrypi', 'agent_scheme': 'http', 'agent_port': 5001, 'status': 'ACTIVE', 'Serial Number': '10000000bd228090'} )------------------------------------------------------------------
+
+================================================================================
+LATEST UPDATED DEVICE:
+   Serial:    10000000bd228090
+   Updated:   2026-04-14 09:40:51.617737
+   IP data:   {'lo': '127.0.0.1', 'eth0': '192.168.1.111'}
+   Target IP: 192.168.1.111
+================================================================================
+
+================================================================================
+HEARTBEAT RECEIVED
+   Sender: 192.168.1.111
+   Target: 192.168.1.111 (last updated)
+================================================================================
+   ACCEPTED - Device discovery ENABLED
+192.168.1.111 ---------------------------
+   WARNING: No SNAPSHOT_DIR configured for 192.168.1.111
+   Registered: 192.168.1.111
+================================================================================

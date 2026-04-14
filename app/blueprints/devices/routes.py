@@ -532,6 +532,12 @@ def device_discovery():
     agent_ip = payload.get("IP") or payload.get("ip") or get_remote_ip()
     agent_scheme = (payload.get("agent_scheme") or DEFAULT_AGENT_SCHEME).strip().lower()
     agent_port = int(payload.get("agent_port") or DEFAULT_AGENT_PORT)
+    payload_serial = (
+        payload.get("Serial Number")
+        or payload.get("serial_number")
+        or payload.get("serial")
+        or ""
+    ).strip()
 
     TARGET_IP = None
     TARGET_SERIAL = None
@@ -540,22 +546,43 @@ def device_discovery():
     try:
         with psycopg2.connect(_build_dsn()) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    """
-                    SELECT
-                        dm.serial_number,
-                        dm.updated_at,
-                        si.ip_address,
-                        si.created_at as ip_created_at
-                    FROM public.device_master dm
-                    INNER JOIN public.system_information si
-                        ON dm.serial_number = si.serial_number
-                    WHERE dm.serial_number IS NOT NULL
-                        AND si.ip_address IS NOT NULL
-                    ORDER BY dm.updated_at DESC, si.created_at DESC
-                    LIMIT 1
-                    """
-                )
+                if payload_serial:
+                    # Primary path: resolve this specific device by its serial_number
+                    cur.execute(
+                        """
+                        SELECT
+                            dm.serial_number,
+                            dm.updated_at,
+                            si.ip_address,
+                            si.created_at as ip_created_at
+                        FROM public.device_master dm
+                        INNER JOIN public.system_information si
+                            ON dm.serial_number = si.serial_number
+                        WHERE dm.serial_number = %s
+                            AND si.ip_address IS NOT NULL
+                        ORDER BY si.created_at DESC
+                        LIMIT 1
+                        """,
+                        (payload_serial,),
+                    )
+                else:
+                    # Fallback: last updated device (legacy behavior)
+                    cur.execute(
+                        """
+                        SELECT
+                            dm.serial_number,
+                            dm.updated_at,
+                            si.ip_address,
+                            si.created_at as ip_created_at
+                        FROM public.device_master dm
+                        INNER JOIN public.system_information si
+                            ON dm.serial_number = si.serial_number
+                        WHERE dm.serial_number IS NOT NULL
+                            AND si.ip_address IS NOT NULL
+                        ORDER BY dm.updated_at DESC, si.created_at DESC
+                        LIMIT 1
+                        """
+                    )
                 result = cur.fetchone()
 
                 if result:
