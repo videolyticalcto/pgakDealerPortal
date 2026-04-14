@@ -67,7 +67,8 @@ PRENTER_FILENAME = "prenter_v3.py"
 PRENTER_PY = os.path.join(BASE_DIR, PRENTER_FILENAME)
 
 # ── Snapshot dir ───────────────────────────────────────────────────────────
-SNAPSHOT_DIR = r"\\192.168.1.111\pi4\SharedFolder"
+# NOTE: No hardcoded SNAPSHOT_DIR. Always resolve per-request via
+# resolve_snapshot_dir_for_serial(serial_number) or get_snapshot_dir(ip).
 
 
 # =============================================================================
@@ -112,6 +113,41 @@ def get_snapshot_dir(target_ip):
     else:
         print(f"   WARNING: No SNAPSHOT_DIR configured for {target_ip}")
     return snapshot_dir
+
+
+def resolve_ip_from_serial(serial_number: str) -> Optional[str]:
+    """Look up the current IP address for a given serial_number from system_information."""
+    if not serial_number:
+        return None
+    try:
+        with psycopg2.connect(_build_dsn()) as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT ip_address
+                    FROM public.system_information
+                    WHERE serial_number = %s
+                      AND ip_address IS NOT NULL
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                    """,
+                    (serial_number,),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return None
+                return _extract_first_ip(row["ip_address"])
+    except Exception as e:
+        print(f"resolve_ip_from_serial error: {e}")
+        return None
+
+
+def resolve_snapshot_dir_for_serial(serial_number: str) -> Tuple[Optional[str], Optional[str]]:
+    """Resolve (ip, snapshot_dir) for a serial_number. No hardcoded fallback."""
+    ip = resolve_ip_from_serial(serial_number)
+    if not ip:
+        return None, None
+    return ip, get_snapshot_dir(ip)
 
 
 def _extract_first_ip(ip_dict_or_value) -> Optional[str]:
@@ -482,7 +518,7 @@ def device_discovery():
     Uses direct JOIN query for latest updated device.
     """
     payload = request.get_json(silent=True)
-    print(payload, ")")
+    print(payload, ")------------------------------------------------------------------")
 
     if payload is None:
         raw = request.get_data(as_text=True)
@@ -777,23 +813,41 @@ def devices_list():
 
 @devices_bp.route("/snapshots/<path:filename>")
 def serve_snapshot(filename):
-    full_path = os.path.join(SNAPSHOT_DIR, filename)
+    serial = (request.args.get("serial_number") or request.args.get("serial") or "").strip()
+    target_ip = (request.args.get("ip") or request.args.get("target_ip") or "").strip()
+
+    snapshot_dir = None
+    resolved_ip = None
+
+    if serial:
+        resolved_ip, snapshot_dir = resolve_snapshot_dir_for_serial(serial)
+    elif target_ip:
+        resolved_ip = target_ip
+        snapshot_dir = get_snapshot_dir(target_ip)
 
     print("==== SNAPSHOT SERVE DEBUG ====")
     print("Requested filename:", filename)
-    print("SNAPSHOT_DIR:", SNAPSHOT_DIR)
+    print("serial_number:", serial or "-")
+    print("resolved_ip:", resolved_ip or "-")
+    print("SNAPSHOT_DIR:", snapshot_dir or "-")
+
+    if not snapshot_dir:
+        return jsonify({
+            "ok": False,
+            "message": "Unable to resolve snapshot directory for the given serial_number/ip",
+            "serial_number": serial or None,
+            "target_ip": resolved_ip or None,
+        }), 404
+
+    full_path = os.path.join(snapshot_dir, filename)
     print("Full path:", full_path)
     print("Exists?:", os.path.exists(full_path))
     print("Is file?:", os.path.isfile(full_path))
-    try:
-        print("Dir listing (first 20):", os.listdir(SNAPSHOT_DIR)[:20])
-    except Exception as e:
-        print("Listdir error:", e)
 
     if not os.path.isfile(full_path):
         abort(404)
 
-    return send_from_directory(SNAPSHOT_DIR, filename)
+    return send_from_directory(snapshot_dir, filename)
 
 
 @devices_bp.route("/images/<path:filename>", methods=["GET"])

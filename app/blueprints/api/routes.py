@@ -56,6 +56,58 @@ def _normalize_agent_id(agent_id: str) -> str:
     return agent_id
 
 
+def _resolve_agent_ip_from_serial(serial_number: str):
+    """
+    Resolve the current agent IP for a given serial_number from system_information.
+    Picks eth*/wlan*/other non-loopback in that order. Returns None if unresolved.
+    """
+    serial_number = (serial_number or "").strip()
+    if not serial_number:
+        return None
+    try:
+        with psycopg2.connect(_build_dsn()) as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT ip_address
+                    FROM public.system_information
+                    WHERE serial_number = %s
+                      AND ip_address IS NOT NULL
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                    """,
+                    (serial_number,),
+                )
+                row = cur.fetchone()
+        if not row:
+            return None
+        ip_data = row["ip_address"]
+
+        def _ok(v):
+            return (
+                isinstance(v, str)
+                and v.count(".") == 3
+                and not v.startswith("127.")
+                and v != "0.0.0.0"
+            )
+
+        if isinstance(ip_data, dict):
+            for prefix in ("eth", "wlan"):
+                for k, v in sorted(ip_data.items()):
+                    if k.startswith(prefix) and _ok(v):
+                        return v
+            for k, v in sorted(ip_data.items()):
+                if _ok(v):
+                    return v
+            return None
+        if _ok(ip_data):
+            return ip_data
+        return None
+    except Exception as e:
+        logger.warning(f"_resolve_agent_ip_from_serial error for {serial_number}: {e}")
+        return None
+
+
 # ── Scan results storage ───────────────────────────────────────────────────
 SCAN_RESULTS_LOCK = threading.Lock()
 SCAN_RESULTS = {}  # scan_key -> {"count": N, "devices": [...], "timestamp": T}
@@ -1006,10 +1058,27 @@ def api_scan():
     if not username or not password:
         return jsonify({"status": "error", "message": "username/password required"}), 400
 
-    # Step 1: Get agent_id from request (optional)
-    raw_agent_id = (data.get("agent_id") or data.get("agent") or "").strip()
-    agent_id = _normalize_agent_id(raw_agent_id) if raw_agent_id else ""
-    print(f"   Requested agent_id: '{agent_id}'")
+    # Step 1: Prefer serial_number-based resolution (most reliable)
+    serial_number = (data.get("serial_number") or data.get("serial") or "").strip()
+    agent_id = ""
+    if serial_number:
+        resolved_ip = _resolve_agent_ip_from_serial(serial_number)
+        if resolved_ip:
+            agent_id = resolved_ip
+            print(f"   Resolved agent_id from serial_number '{serial_number}': {agent_id}")
+        else:
+            print(f"   serial_number '{serial_number}' provided but no IP found in system_information")
+            return jsonify({
+                "status": "error",
+                "message": f"Could not resolve IP for serial_number '{serial_number}'. Device not registered or has no IP.",
+                "serial_number": serial_number,
+            }), 404
+
+    # Step 1b: Fallback - Get agent_id from request body
+    if not agent_id:
+        raw_agent_id = (data.get("agent_id") or data.get("agent") or "").strip()
+        agent_id = _normalize_agent_id(raw_agent_id) if raw_agent_id else ""
+        print(f"   Requested agent_id: '{agent_id}'")
 
     # Step 2: Auto-select VERIFIED agent from AGENTS dict
     if not agent_id:
