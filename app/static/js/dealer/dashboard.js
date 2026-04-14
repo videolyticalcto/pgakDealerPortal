@@ -379,7 +379,7 @@
                 devicesWithRTSP.forEach((device, filteredIndex) => {
                     // Find original index in full devices array for analytics lookup
                     const originalIndex = devices.indexOf(device);
-                    const ip = d.device_ip || d.ip || d.ip_address || d.address || d.host || 'N/A';
+                    const ip = device.device_ip || device.ip || device.ip_address || device.address || device.host || 'N/A';
                     const snapshot = device.screenshot_path || device.image_url || (device.device_ip || device.ip) ? `${(window.PGAK_CONFIG && window.PGAK_CONFIG.BASE_IMAGE_API) || 'https://dealer.pgak.co.in/images/'}${device.device_ip || device.ip}_jpg` : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
                     const serial = device.device_info?.SerialNumber || `Device-${filteredIndex}`;
                     const deviceKey = `device-${filteredIndex}`;
@@ -598,7 +598,12 @@
             const maxLimit = getAnalyticsCameraLimit();
             if (maxLimit === 0) { limitBar.style.display = 'none'; return; }
 
-            const checkedCount = document.querySelectorAll('#analyticsCheckboxList input[type="checkbox"]:checked').length;
+            // Global usage: saved selections for OTHER devices + current modal checkboxes
+            let checkedCount = 0;
+            Object.entries(deviceAnalyticsSelections).forEach(([devIdx, sels]) => {
+                if (String(devIdx) !== String(currentDeviceIndex)) checkedCount += (sels || []).length;
+            });
+            checkedCount += document.querySelectorAll('#analyticsCheckboxList input[type="checkbox"]:checked').length;
             const pct = Math.min(100, Math.round((checkedCount / maxLimit) * 100));
 
             limitBar.style.display = 'block';
@@ -620,6 +625,19 @@
             }
         }
 
+        // ✅ Count how many devices already consumed each analytics type (excluding current device)
+        function getAnalyticsUsage(excludeDeviceIndex) {
+            const usage = {};
+            Object.entries(deviceAnalyticsSelections).forEach(([devIdx, sels]) => {
+                if (String(devIdx) === String(excludeDeviceIndex)) return;
+                (sels || []).forEach(s => {
+                    const key = (s.analyticsType || '').toLowerCase();
+                    usage[key] = (usage[key] || 0) + 1;
+                });
+            });
+            return usage;
+        }
+
         function renderAnalyticsCheckboxes(deviceIndex) {
             const checkboxList = document.getElementById('analyticsCheckboxList');
             checkboxList.innerHTML = '';
@@ -632,54 +650,62 @@
                 return;
             }
 
-            // Calculate max allowed cameras
-            const maxLimit = getAnalyticsCameraLimit();
+            // Current device's existing selections (multiple different analytics allowed)
+            const currentSels = deviceAnalyticsSelections[deviceIndex] || [];
+            const currentKeys = new Set(currentSels.map(s => (s.analyticsType || '').toLowerCase()));
 
-            const extractedAnalytics = {};
+            // Usage from OTHER devices
+            const usage = getAnalyticsUsage(deviceIndex);
+
             Object.entries(analyticsData).forEach(([analyticsKey, analyticsValue]) => {
-                const cameraIds = analyticsValue?.camera_ids || [];
-                cameraIds.forEach((cameraId) => {
-                    const analyticsMatch = cameraId.match(/^(.*?)\s*\(\d+\s*Cameras?\)$/);
-                    if (analyticsMatch) {
-                        const analyticsName = analyticsMatch[1].trim();
-                        if (!extractedAnalytics[analyticsName]) extractedAnalytics[analyticsName] = [];
-                        extractedAnalytics[analyticsName].push(cameraId);
-                    } else {
-                        const analyticsName = cameraId.trim();
-                        if (!extractedAnalytics[analyticsName]) extractedAnalytics[analyticsName] = [];
-                        extractedAnalytics[analyticsName].push(analyticsName);
-                    }
-                });
+                const total = analyticsValue?.count || 0;
+                const used  = usage[analyticsKey.toLowerCase()] || 0;
+                const displayName = analyticsKey.replace(/\b\w/g, c => c.toUpperCase());
+                const isChecked = currentKeys.has(analyticsKey.toLowerCase());
+                const slotsFull = used >= total;
+                const disabled = slotsFull && !isChecked;
+
+                const uniqueId = `analytics_opt_${analyticsKey.replace(/\s/g, '_')}_${deviceIndex}`;
+                const item = document.createElement('div');
+                item.className = 'analytics-checkbox-item';
+                if (disabled) item.style.opacity = '0.5';
+                item.innerHTML = `
+                    <input type="checkbox"
+                           id="${uniqueId}"
+                           value="${analyticsKey}"
+                           ${isChecked ? 'checked' : ''}
+                           ${disabled ? 'disabled' : ''}
+                           data-analytics-type="${analyticsKey}"
+                           data-camera-name="${displayName}"
+                           onchange="onAnalyticsCheckboxChange2(this)">
+                    <label for="${uniqueId}" style="flex:1; cursor:${disabled ? 'not-allowed' : 'pointer'};">
+                        <div style="font-weight:600; color:#111; text-transform:capitalize;">${displayName}</div>
+                        <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                            ${used} / ${total} used
+                            ${slotsFull && !isChecked ? ' — no slots left' : ''}
+                        </div>
+                    </label>
+                `;
+                checkboxList.appendChild(item);
             });
 
-            const selectedAnalytics = deviceAnalyticsSelections[deviceIndex] || [];
+            updateCameraLimitBar();
+        }
 
-            Object.entries(extractedAnalytics).forEach(([analyticsName, cameras]) => {
-                cameras.forEach((cameraId) => {
-                    const isSelected = selectedAnalytics.some(item =>
-                        item.analyticsType === analyticsName && item.cameraName === cameraId
-                    );
-                    const checkboxItem = document.createElement('div');
-                    checkboxItem.className = 'analytics-checkbox-item';
-                    const uniqueId = `analytics_${analyticsName.replace(/\s/g, '_')}_${cameraId.replace(/\s/g, '_')}_${deviceIndex}`;
-                    checkboxItem.innerHTML = `
-                        <input type="checkbox"
-                               id="${uniqueId}"
-                               value="${analyticsName}:${cameraId}"
-                               ${isSelected ? 'checked' : ''}
-                               data-analytics-type="${analyticsName}"
-                               data-camera-name="${cameraId}"
-                               onchange="onAnalyticsCheckboxChange(this, ${maxLimit})">
-                        <label for="${uniqueId}" style="flex: 1; cursor: pointer;">
-                            <div style="font-weight: 600; color: var(--gray-900);">${analyticsName}</div>
-                            <div style="font-size: 12px; color: var(--gray-600); margin-top: 2px;">${cameraId}</div>
-                        </label>
-                    `;
-                    checkboxList.appendChild(checkboxItem);
-                });
-            });
-
-            // Show limit bar and initial count
+        // ✅ Checkbox change: prevent exceeding slots live
+        function onAnalyticsCheckboxChange2(cb) {
+            if (cb.checked) {
+                const key = (cb.dataset.analyticsType || '').toLowerCase();
+                const total = Object.entries(window.analyticsDataCache?.by_analytics || {})
+                    .find(([k]) => k.toLowerCase() === key)?.[1]?.count || 0;
+                const usage = getAnalyticsUsage(currentDeviceIndex);
+                const used = usage[key] || 0;
+                if (used >= total) {
+                    cb.checked = false;
+                    anToast('❌ ' + cb.dataset.cameraName + ' ke slots full hain!', '#991b1b');
+                    return;
+                }
+            }
             updateCameraLimitBar();
         }
 
@@ -728,10 +754,10 @@
             const dropdown = document.getElementById('analyticsCustomerDropdown');
 
             // Reset state
-            checkboxList.innerHTML = '<p style="text-align: center; color: var(--gray-400); padding: 20px; font-size: 13px;">👆 Please select a customer above to load their analytics.</p>';
+            if (checkboxList) checkboxList.innerHTML = '<p style="text-align: center; color: var(--gray-400); padding: 20px; font-size: 13px;">👆 Please select a customer above to load their analytics.</p>';
             if (loader) loader.style.display = 'none';
 
-            modal.classList.add('show');
+            if (modal) modal.classList.add('show');
 
             // Populate customer dropdown (fetches from API if needed)
             await populateAnalyticsCustomerDropdown();
@@ -751,19 +777,24 @@
         function applySelectedAnalytics() {
             if (currentDeviceIndex === null) return;
 
-            const checkboxes = document.querySelectorAll('#analyticsCheckboxList input[type="checkbox"]:checked');
+            const checkedBoxes = document.querySelectorAll('#analyticsCheckboxList input[type="checkbox"]:checked');
 
-            // ✅ Final limit check before applying
-            const maxLimit = getAnalyticsCameraLimit();
-            if (maxLimit > 0 && checkboxes.length > maxLimit) {
-                anToast('❌ Maximum ' + maxLimit + ' cameras hi select kar sakte hain! Abhi ' + checkboxes.length + ' selected hain.', '#991b1b');
-                return;
+            // Revalidate each selected analytics against global slots
+            const usage = getAnalyticsUsage(currentDeviceIndex);
+            for (const cb of checkedBoxes) {
+                const key = (cb.dataset.analyticsType || '').toLowerCase();
+                const total = Object.entries(window.analyticsDataCache?.by_analytics || {})
+                    .find(([k]) => k.toLowerCase() === key)?.[1]?.count || 0;
+                if ((usage[key] || 0) >= total) {
+                    anToast('❌ ' + cb.dataset.cameraName + ' ke slots full hain!', '#991b1b');
+                    return;
+                }
             }
 
-            const selections = Array.from(checkboxes).map(cb => ({
+            const selections = Array.from(checkedBoxes).map(cb => ({
                 analyticsType: cb.dataset.analyticsType,
                 cameraName: cb.dataset.cameraName,
-                rtsp_url: null // Will be filled during save
+                rtsp_url: null
             }));
 
             // Store selections for this device

@@ -1,0 +1,56 @@
+(env) pi4@raspberrypi:~/pgak $ python latest_10_march.py
+============================================================
+🚀 ONVIF Agent Starting
+============================================================
+✅ DB pool initialized
+✅ [db_migrate] Schema migration complete
+🔌 Connecting to 192.168.1.241:5006...
+🚀 Socket connection thread started
+⏳ Waiting for socket connection...
+✅ Connected to socket hub!
+✅ Socket connected!
+✅ HTTP heartbeat started
+============================================================
+🌐 Server: https://0.0.0.0:5001
+🔌 Socket: 192.168.1.241:5006
+============================================================
+ * Serving Flask app 'latest_10_march'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.111:5001
+Press CTRL+C to quit
+⚠️ /device_discovery returned HTTP 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai
+✅ Heartbeat sent: IP=192.168.1.111
+⚠️ Receiver error: [Errno 104] Connection reset by peer
+👋 Socket receiver stopped
+🔁 Reconnecting in 5s...
+⚠️ /device_discovery returned HTTP 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai
+✅ Heartbeat sent: IP=192.168.1.111
+🔌 Connecting to 192.168.1.241:5006...
+✅ Connected to socket hub!
+⚠️ /device_discovery returned HTTP 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai
+✅ Heartbeat sent: IP=192.168.1.111
+⚠️ /device_discovery returned HTTP 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai
+✅ Heartbeat sent: IP=192.168.1.111
+⚠️ /device_discovery returned HTTP 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
