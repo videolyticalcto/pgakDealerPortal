@@ -287,6 +287,59 @@
         </div>
     </div>
 </div>
+
+<!-- Select Analytics Modal -->
+<div id="analyticsModal" class="modal-overlay" style="display:none;">
+    <style>
+        #analyticsModal.show { display: flex !important; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; }
+        #analyticsModal .an-modal-box { background: #fff; border-radius: 12px; width: 92%; max-width: 520px; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+        #analyticsModal .an-head { padding: 14px 18px; border-bottom: 1px solid #eee; display:flex; align-items:center; justify-content:space-between; }
+        #analyticsModal .an-head h3 { margin: 0; font-size: 16px; color: #111; }
+        #analyticsModal .an-body { padding: 14px 18px; overflow-y: auto; }
+        #analyticsModal .an-foot { padding: 12px 18px; border-top: 1px solid #eee; display:flex; gap:8px; justify-content:flex-end; }
+        #analyticsModal select, #analyticsModal .an-list { width:100%; }
+        #analyticsModal .an-list { min-height: 80px; border:1px solid #eee; border-radius:8px; padding:8px; margin-top:10px; background:#fafafa; }
+        #analyticsModal .an-btn { padding:8px 14px; border-radius:8px; border:none; cursor:pointer; font-size:13px; }
+        #analyticsModal .an-btn.primary { background:#2563eb; color:#fff; }
+        #analyticsModal .an-btn.secondary { background:#e5e7eb; color:#111; }
+        #analyticsModal .an-close { background:transparent; border:none; font-size:22px; cursor:pointer; color:#666; }
+        #analyticsCameraLimitBar { margin-top:10px; }
+        #analyticsCameraLimitBar_fill { height:6px; background:#2563eb; width:0%; border-radius:4px; transition:width .2s; }
+        #analyticsCameraLimitBar .bar-track { height:6px; background:#e5e7eb; border-radius:4px; overflow:hidden; }
+        #analyticsCameraLimitWarning { color:#991b1b; font-size:12px; margin-top:6px; display:none; }
+        #analyticsModal .analytics-checkbox-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; margin-bottom:6px; }
+        #analyticsModal .analytics-checkbox-item input[type=checkbox] { width:16px; height:16px; accent-color:#2563eb; cursor:pointer; }
+        #analyticsModal .analytics-checkbox-item label { margin:0; cursor:pointer; }
+    </style>
+    <div class="an-modal-box">
+        <div class="an-head">
+            <h3><i class="fas fa-chart-line"></i> Select Analytics</h3>
+            <button class="an-close" onclick="closeAnalyticsModal()">&times;</button>
+        </div>
+        <div class="an-body">
+            <label style="font-size:13px; color:#333; font-weight:600;">Customer</label>
+            <select id="analyticsCustomerDropdown" style="padding:8px; border:1px solid #ddd; border-radius:8px; margin-top:6px;"
+                    onchange="onAnalyticsCustomerChange(this.value)">
+                <option value="">-- Select Customer --</option>
+            </select>
+            <div id="analyticsCustomerLoader" style="display:none; font-size:12px; color:#666; margin-top:6px;">⏳ Loading analytics...</div>
+
+            <div id="analyticsCameraLimitBar" style="display:none;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#333; margin-bottom:4px;">
+                    <span id="analyticsCameraLimitText">0 / 0 selected</span>
+                </div>
+                <div class="bar-track"><div id="analyticsCameraLimitBar_fill"></div></div>
+                <div id="analyticsCameraLimitWarning">⚠️ Camera limit reached</div>
+            </div>
+
+            <div id="analyticsCheckboxList" class="an-list"></div>
+        </div>
+        <div class="an-foot">
+            <button class="an-btn secondary" onclick="closeAnalyticsModal()">Cancel</button>
+            <button class="an-btn primary" onclick="applySelectedAnalytics()">Apply</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
