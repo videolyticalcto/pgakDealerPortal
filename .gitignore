@@ -8,3 +8,11 @@ selfsigned.crt
 selfsigned.key
 dealer_pgak_co_in.crt
 dealer_pgak.key
+*.log
+logs.txt
+latest_10_march.log
+.venv/
+venv/
+node_modules/
+*.sqlite
+*.db
