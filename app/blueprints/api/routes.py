@@ -1443,12 +1443,13 @@ def static_ip_discovery():
     username = (data.get("username") or "").strip()
     password = (data.get("password") or "").strip()
     port = int(data.get("port") or 80)
+    rtsp_port = int(data.get("rtsp_port") or 554)
 
     if not ip or not username or not password:
         return jsonify({"status": "error", "message": "IP, username, and password are required"}), 400
 
     try:
-        result = discover_onvif_cameras(ip, port, username, password)
+        result = discover_onvif_cameras(ip, port, username, password, rtsp_port)
 
         devices = []
         for cam in result.get("cameras", []):

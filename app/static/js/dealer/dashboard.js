@@ -5093,15 +5093,18 @@ function isValidIpv4Address(value) {
 async function startStaticIpDiscovery() {
     const ip = (document.getElementById('staticIpAddress')?.value || '').trim();
     const portRaw = (document.getElementById('staticIpPort')?.value || '').trim();
+    const rtspPortRaw = (document.getElementById('staticIpRtspPort')?.value || '').trim();
     const username = (document.getElementById('staticIpUsername')?.value || '').trim();
     const password = (document.getElementById('staticIpPassword')?.value || '').trim();
     const port = portRaw ? Number(portRaw) : null;
+    const rtsp_port = rtspPortRaw ? Number(rtspPortRaw) : null;
 
     hideStaticIpError();
 
     if (!ip) { showStaticIpError('Please enter a static IP address.'); return; }
     if (!isValidIpv4Address(ip)) { showStaticIpError('Please enter a valid IPv4 address, for example 192.168.1.120.'); return; }
     if (portRaw && (!Number.isInteger(port) || port < 1 || port > 65535)) { showStaticIpError('Please enter a valid port between 1 and 65535.'); return; }
+    if (rtspPortRaw && (!Number.isInteger(rtsp_port) || rtsp_port < 1 || rtsp_port > 65535)) { showStaticIpError('Please enter a valid RTSP port between 1 and 65535.'); return; }
     if (!username) { showStaticIpError('Please enter a username.'); return; }
     if (!password) { showStaticIpError('Please enter a password.'); return; }
 
@@ -5115,7 +5118,7 @@ async function startStaticIpDiscovery() {
         const res = await fetch('/api/static-ip-discovery', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ip, username, password, port })
+            body: JSON.stringify({ ip, username, password, port, rtsp_port })
         });
 
         const out = await res.json().catch(() => ({}));
