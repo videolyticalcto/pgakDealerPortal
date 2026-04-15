@@ -164,6 +164,7 @@ def discover_onvif_cameras(ip: str, port: int, username: str, password: str, rts
         "cameras": [],
         "error": None,
         "error_details": [],
+        "rtsp_port": rtsp_port,
     }
 
     try:
@@ -446,5 +447,5 @@ def discover_onvif_cameras(ip: str, port: int, username: str, password: str, rts
 
 
 if __name__ == "__main__":
-    res=discover_onvif_cameras("202.160.134.130", "8082", "admin", "`   `   AZZZZZZZZZZZZZZZZZZZZZZZZZZZZZA``")
+    res=discover_onvif_cameras("202.160.134.130", "8082", "admin", "Central@0001", "1082")
     print(res)
