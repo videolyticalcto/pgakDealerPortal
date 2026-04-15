@@ -1738,6 +1738,27 @@ def _placeholder_response():
     return Response(_PLACEHOLDER_JPEG, mimetype="image/jpeg", headers={"Cache-Control": "no-store"})
 
 
+def _sanitize_rtsp_url(rtsp_url: str) -> str:
+    """Re-encode userinfo so passwords containing '@', ':', '/', etc. don't break parsing."""
+    try:
+        if not rtsp_url.lower().startswith("rtsp://"):
+            return rtsp_url
+        rest = rtsp_url[7:]
+        if "@" not in rest:
+            return rtsp_url
+        userinfo, _, hostpart = rest.rpartition("@")
+        if ":" in userinfo:
+            user, _, pwd = userinfo.partition(":")
+        else:
+            user, pwd = userinfo, ""
+        user_q = quote(user, safe="")
+        pwd_q = quote(pwd, safe="")
+        auth = f"{user_q}:{pwd_q}" if pwd else user_q
+        return f"rtsp://{auth}@{hostpart}"
+    except Exception:
+        return rtsp_url
+
+
 def _inject_channel_into_rtsp(rtsp_url: str, channel: str | int | None) -> str:
     if not channel:
         return rtsp_url
@@ -1758,12 +1779,16 @@ def static_ip_thumbnail():
     rtsp_url = (request.args.get("rtsp_url") or "").strip()
     channel = request.args.get("channel")
 
+    print(rtsp_url,channel,'-------------------------------------------------------------------------------')
+
     if not rtsp_url or not rtsp_url.lower().startswith("rtsp://"):
         return _placeholder_response()
 
+    rtsp_url = _sanitize_rtsp_url(rtsp_url)
     rtsp_url = _inject_channel_into_rtsp(rtsp_url, channel)
+    print(rtsp_url,'====================================================================')
 
-    ffmpeg_bin = shutil.which("ffmpeg") or r"C:\ffmpeg\bin\ffmpeg.exe"
+    ffmpeg_bin = shutil.which("ffmpeg") or "ffmpeg"
     cmd = [
         ffmpeg_bin,
         "-rtsp_transport", "tcp",
