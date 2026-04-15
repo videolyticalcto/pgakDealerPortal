@@ -518,7 +518,7 @@ def device_discovery():
     Uses direct JOIN query for latest updated device.
     """
     payload = request.get_json(silent=True)
-    #print(payload, "payload------------------------------------------------------------------")
+    print(payload, "payload------------------------------------------------------------------")
 
     if payload is None:
         raw = request.get_data(as_text=True)
@@ -547,7 +547,7 @@ def device_discovery():
         with psycopg2.connect(_build_dsn()) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 if payload_serial:
-                    #print(' WHERE dm.serial_number = %s................................................................')
+                    print(' WHERE dm.serial_number = %s................................................................')
                     # Primary path: resolve this specific device by its serial_number
                     cur.execute(
                         """
@@ -567,7 +567,7 @@ def device_discovery():
                         (payload_serial,),
                     )
                 else:
-                    #print(' ON dm.serial_number = si.serial_number--------------------------------------------------------')
+                    print(' ON dm.serial_number = si.serial_number--------------------------------------------------------')
                     # Fallback: last updated device (legacy behavior)
                     cur.execute(
                         """

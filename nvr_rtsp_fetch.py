@@ -156,7 +156,7 @@ def discover_prama_isapi_cameras(ip: str, port: int, username: str, password: st
 
 
 def discover_onvif_cameras(ip: str, port: int, username: str, password: str, rtsp_port: int = 554) -> Dict:
-    print('[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]', ip, port, username, password, rtsp_port)
+    print('discover_onvif_cameras', ip, port, username, password, rtsp_port)
     result = {
         "success": False,
         "manufacturer": None,
@@ -171,7 +171,6 @@ def discover_onvif_cameras(ip: str, port: int, username: str, password: str, rts
         session = requests.Session()
         session.verify = False
         auth = HTTPDigestAuth(username, password)
-        print(auth,'========================')
         connection_tested = False
         auth_tested = False
         nvr_detected = False

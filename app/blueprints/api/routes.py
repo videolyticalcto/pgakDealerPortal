@@ -1787,14 +1787,13 @@ def static_ip_thumbnail():
     rtsp_url = (request.args.get("rtsp_url") or "").strip()
     channel = request.args.get("channel")
 
-    print(rtsp_url,channel,'-------------------------------------------------------------------------------')
 
     if not rtsp_url or not rtsp_url.lower().startswith("rtsp://"):
         return _placeholder_response()
 
     rtsp_url = _sanitize_rtsp_url(rtsp_url)
     rtsp_url = _inject_channel_into_rtsp(rtsp_url, channel)
-    print(rtsp_url,'====================================================================')
+    
 
     ffmpeg_bin = shutil.which("ffmpeg") or "ffmpeg"
     cmd = [
