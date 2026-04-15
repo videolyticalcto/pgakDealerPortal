@@ -718,6 +718,53 @@
     font-weight: 600;
 }
 
+.static-ip-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.static-ip-pagination-info {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.static-ip-pagination-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.static-ip-page-btn {
+    padding: 6px 12px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #1e293b;
+}
+
+.static-ip-page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.static-ip-page-btn:not(:disabled):hover {
+    background: #e2e8f0;
+}
+
+.static-ip-page-indicator {
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+}
+
 .static-ip-preview-placeholder {
     width: 64px;
     height: 40px;

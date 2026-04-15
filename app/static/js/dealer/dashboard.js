@@ -4847,6 +4847,7 @@ function renderStaticIpDiscoveryResults(devices) {
     const subtext = document.getElementById('staticIpResultsSubtext');
     const list = Array.isArray(devices) ? devices : [];
 
+    if (window._staticIpDiscoveredDevices !== list) window._staticIpCurrentPage = 1;
     window._staticIpDiscoveredDevices = list;
     window.staticIpAssignmentState.discoveredDevices = list;
     if (count) count.textContent = list.length + ' camera(s)';
@@ -4867,7 +4868,16 @@ function renderStaticIpDiscoveryResults(devices) {
         return;
     }
 
-    tbody.innerHTML = list.map((device, index) => {
+    const pageSize = 10;
+    if (typeof window._staticIpCurrentPage !== 'number') window._staticIpCurrentPage = 1;
+    const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+    if (window._staticIpCurrentPage > totalPages) window._staticIpCurrentPage = totalPages;
+    const currentPage = window._staticIpCurrentPage;
+    const startIdx = (currentPage - 1) * pageSize;
+    const endIdx = Math.min(startIdx + pageSize, list.length);
+
+    tbody.innerHTML = list.slice(startIdx, endIdx).map((device, pageOffset) => {
+        const index = startIdx + pageOffset;
         const channel = staticIpEscape(device.channel || (index + 1));
         const ip = staticIpEscape(device.address || device.device_ip || device.ip || '—');
         const previewHtml = buildStaticIpPreviewHtml(device, index);
@@ -4876,12 +4886,49 @@ function renderStaticIpDiscoveryResults(devices) {
         return `<tr><td class="static-ip-checkbox-cell"><input type="checkbox" class="static-ip-row-checkbox" id="staticIpRowCheck-${index}" onchange="updateStaticIpRowSelection()"></td><td>${previewHtml}</td><td><span class="static-ip-channel-badge">CH ${channel}</span></td><td class="static-ip-ip-cell">${ip}</td><td class="static-ip-analytics-cell">${analyticsHtml}</td></tr>`;
     }).join('');
 
+    renderStaticIpPagination(list.length, currentPage, totalPages, startIdx, endIdx);
+
     if (results) results.classList.add('active');
     lazyLoadStaticIpThumbnails();
     list.forEach((_, index) => updateStaticIpDropdownSummary(index));
     refreshStaticIpAnalyticsDisabledStates();
     updateStaticIpRowSelection();
     updateStaticIpSaveState();
+}
+
+function renderStaticIpPagination(total, currentPage, totalPages, startIdx, endIdx) {
+    let container = document.getElementById('staticIpPagination');
+    const tbody = document.getElementById('staticIpResultsTbody');
+    if (!tbody) return;
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'staticIpPagination';
+        container.className = 'static-ip-pagination';
+        const table = tbody.closest('table');
+        if (table && table.parentNode) {
+            table.parentNode.insertBefore(container, table.nextSibling);
+        }
+    }
+    if (total === 0) { container.innerHTML = ''; return; }
+
+    const prevDisabled = currentPage <= 1 ? 'disabled' : '';
+    const nextDisabled = currentPage >= totalPages ? 'disabled' : '';
+    container.innerHTML = `
+        <span class="static-ip-pagination-info">Showing ${startIdx + 1}-${endIdx} of ${total}</span>
+        <div class="static-ip-pagination-controls">
+            <button type="button" class="static-ip-page-btn" ${prevDisabled} onclick="goStaticIpPage(${currentPage - 1})">Prev</button>
+            <span class="static-ip-page-indicator">Page ${currentPage} / ${totalPages}</span>
+            <button type="button" class="static-ip-page-btn" ${nextDisabled} onclick="goStaticIpPage(${currentPage + 1})">Next</button>
+        </div>
+    `;
+}
+
+function goStaticIpPage(page) {
+    const list = window._staticIpDiscoveredDevices || [];
+    const totalPages = Math.max(1, Math.ceil(list.length / 10));
+    if (page < 1 || page > totalPages) return;
+    window._staticIpCurrentPage = page;
+    renderStaticIpDiscoveryResults(list);
 }
 
 function updateStaticIpRowSelection() {
