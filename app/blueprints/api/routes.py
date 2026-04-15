@@ -1457,11 +1457,19 @@ def static_ip_discovery():
 
         devices = []
         for cam in result.get("cameras", []):
+            rtsp_url = (
+                cam.get("rtsp_sub")
+                or cam.get("rtsp_url")
+                or cam.get("rtsp_main")
+                or ""
+            )
             devices.append({
                 "channel": cam.get("channel", ""),
-                "name": cam.get("name", ""),
+                "name": cam.get("name") or cam.get("label", ""),
                 "ip": ip,
-                "rtsp_url": cam.get("rtsp_url", ""),
+                "rtsp_url": rtsp_url,
+                "rtsp_main": cam.get("rtsp_main", ""),
+                "rtsp_sub": cam.get("rtsp_sub", ""),
                 "snapshot_url": cam.get("snapshot_url", ""),
                 "profile": cam.get("profile", ""),
                 "resolution": cam.get("resolution", ""),
@@ -1791,11 +1799,15 @@ def static_ip_thumbnail():
     ffmpeg_bin = shutil.which("ffmpeg") or "ffmpeg"
     cmd = [
         ffmpeg_bin,
+        "-nostdin",
+        "-loglevel", "error",
         "-rtsp_transport", "tcp",
-        "-stimeout", "5000000",
+        "-stimeout", "3000000",
+        "-analyzeduration", "1000000",
+        "-probesize", "500000",
         "-i", rtsp_url,
         "-frames:v", "1",
-        "-q:v", "5",
+        "-q:v", "8",
         "-f", "image2pipe",
         "-vcodec", "mjpeg",
         "-",
@@ -1805,7 +1817,7 @@ def static_ip_thumbnail():
         proc = subprocess.run(
             cmd,
             capture_output=True,
-            timeout=12,
+            timeout=6,
         )
         if proc.returncode == 0 and proc.stdout[:2] == b"\xff\xd8":
             return Response(
