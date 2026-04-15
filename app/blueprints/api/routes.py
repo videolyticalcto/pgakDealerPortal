@@ -1450,6 +1450,7 @@ def static_ip_discovery():
 
     try:
         result = discover_onvif_cameras(ip, port, username, password, rtsp_port)
+        print(result,'---------------------------------------------------------------------')
 
         devices = []
         for cam in result.get("cameras", []):
@@ -1478,7 +1479,7 @@ def static_ip_discovery():
             "manufacturer": result.get("manufacturer"),
             "model": result.get("model"),
             "onvif_port": port,
-            "rtsp_port": result.get("rtsp_port", 554),
+            "rtsp_port": result.get("rtsp_port"),
             "camera_count": len(devices),
         })
     except Exception as e:
