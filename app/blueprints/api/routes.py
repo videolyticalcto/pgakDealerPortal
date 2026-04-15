@@ -17,7 +17,10 @@ from datetime import datetime, timezone
 import psycopg2
 import requests as http_requests
 from psycopg2.extras import RealDictCursor
-from flask import request, jsonify
+from flask import request, jsonify, Response, send_file
+import subprocess
+import shutil
+from urllib.parse import urlparse, urlunparse, quote
 
 from app.blueprints.api import api_bp
 from app.config import Config
@@ -1709,4 +1712,87 @@ def api_save_analytics():
             "message": "Failed to save analytics",
             "error": str(e)
         }), 500
+
+
+_PLACEHOLDER_JPEG = (
+    b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00"
+    b"\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n"
+    b"\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d"
+    b"\x1a\x1c\x1c $.' \",#\x1c\x1c(7),01444\x1f'9=82<.342\xff\xc0\x00\x0b"
+    b"\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xc4\x00\x1f\x00\x00\x01\x05"
+    b"\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03"
+    b"\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\x00\xb5\x10\x00\x02\x01\x03\x03"
+    b"\x02\x04\x03\x05\x05\x04\x04\x00\x00\x01}\x01\x02\x03\x00\x04\x11\x05"
+    b"\x12!1A\x06\x13Qa\x07\"q\x142\x81\x91\xa1\x08#B\xb1\xc1\x15R\xd1\xf0"
+    b"$3br\x82\t\n\x16\x17\x18\x19\x1a%&'()*456789:CDEFGHIJSTUVWXYZcdefghij"
+    b"stuvwxyz\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98"
+    b"\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7"
+    b"\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6"
+    b"\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3"
+    b"\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x00\x08\x01\x01\x00\x00?\x00\xfb"
+    b"\xd0\xff\xd9"
+)
+
+
+def _placeholder_response():
+    return Response(_PLACEHOLDER_JPEG, mimetype="image/jpeg", headers={"Cache-Control": "no-store"})
+
+
+def _inject_channel_into_rtsp(rtsp_url: str, channel: str | int | None) -> str:
+    if not channel:
+        return rtsp_url
+    try:
+        parsed = urlparse(rtsp_url)
+        path = parsed.path or ""
+        if "Streaming/Channels/" in path:
+            import re as _re
+            path = _re.sub(r"(Streaming/Channels/)(\d+)", lambda m: f"{m.group(1)}{int(channel)}02", path)
+            return urlunparse(parsed._replace(path=path))
+    except Exception:
+        pass
+    return rtsp_url
+
+
+@api_bp.route("/static-ip-thumbnail", methods=["GET"])
+def static_ip_thumbnail():
+    rtsp_url = (request.args.get("rtsp_url") or "").strip()
+    channel = request.args.get("channel")
+
+    if not rtsp_url or not rtsp_url.lower().startswith("rtsp://"):
+        return _placeholder_response()
+
+    rtsp_url = _inject_channel_into_rtsp(rtsp_url, channel)
+
+    ffmpeg_bin = shutil.which("ffmpeg") or r"C:\ffmpeg\bin\ffmpeg.exe"
+    cmd = [
+        ffmpeg_bin,
+        "-rtsp_transport", "tcp",
+        "-stimeout", "5000000",
+        "-i", rtsp_url,
+        "-frames:v", "1",
+        "-q:v", "5",
+        "-f", "image2pipe",
+        "-vcodec", "mjpeg",
+        "-",
+    ]
+
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            timeout=12,
+        )
+        if proc.returncode == 0 and proc.stdout[:2] == b"\xff\xd8":
+            return Response(
+                proc.stdout,
+                mimetype="image/jpeg",
+                headers={"Cache-Control": "public, max-age=30"},
+            )
+        logger.warning("static-ip-thumbnail ffmpeg failed rc=%s stderr=%s", proc.returncode, proc.stderr[-400:])
+    except subprocess.TimeoutExpired:
+        logger.warning("static-ip-thumbnail timeout for %s", rtsp_url)
+    except Exception as e:
+        logger.error("static-ip-thumbnail error: %s", e)
+
+    return _placeholder_response()
 
