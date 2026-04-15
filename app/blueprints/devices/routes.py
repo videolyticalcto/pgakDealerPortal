@@ -518,7 +518,7 @@ def device_discovery():
     Uses direct JOIN query for latest updated device.
     """
     payload = request.get_json(silent=True)
-    print(payload, ")------------------------------------------------------------------")
+    print(payload, "payload------------------------------------------------------------------")
 
     if payload is None:
         raw = request.get_data(as_text=True)
@@ -538,7 +538,7 @@ def device_discovery():
         or payload.get("serial")
         or ""
     ).strip()
-
+    print(f"Device discovery attempt from IP: {agent_ip}, Serial: {payload_serial or '-'}")
     TARGET_IP = None
     TARGET_SERIAL = None
     UPDATED_AT = None
@@ -547,6 +547,7 @@ def device_discovery():
         with psycopg2.connect(_build_dsn()) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 if payload_serial:
+                    print(' WHERE dm.serial_number = %s................................................................')
                     # Primary path: resolve this specific device by its serial_number
                     cur.execute(
                         """
@@ -566,6 +567,7 @@ def device_discovery():
                         (payload_serial,),
                     )
                 else:
+                    print(' ON dm.serial_number = si.serial_number--------------------------------------------------------')
                     # Fallback: last updated device (legacy behavior)
                     cur.execute(
                         """
@@ -623,15 +625,6 @@ def device_discovery():
                     elif isinstance(ip_data, str):
                         if not ip_data.startswith('127.') and ip_data != '0.0.0.0':
                             TARGET_IP = ip_data
-
-                    print(f"\n{'='*80}")
-                    print(f"LATEST UPDATED DEVICE:")
-                    print(f"   Serial:    {TARGET_SERIAL}")
-                    print(f"   Updated:   {UPDATED_AT}")
-                    print(f"   IP data:   {ip_data}")
-                    print(f"   Target IP: {TARGET_IP}")
-                    print(f"{'='*80}")
-
     except Exception as e:
         print(f"Database error: {e}")
         traceback.print_exc()
@@ -647,11 +640,7 @@ def device_discovery():
             "message": "No valid target device found"
         }), 404
 
-    print(f"\n{'='*80}")
-    print(f"HEARTBEAT RECEIVED")
-    print(f"   Sender: {agent_ip}")
-    print(f"   Target: {TARGET_IP} (last updated)")
-    print(f"{'='*80}")
+  
 
     if agent_ip != TARGET_IP:
         print(f"   REJECTED: {agent_ip} != {TARGET_IP}")
@@ -664,10 +653,9 @@ def device_discovery():
             "received_ip": agent_ip
         }), 403
 
-    print(f"   ACCEPTED - Device discovery ENABLED")
+    print(f" ACCEPTED - Device discovery ENABLED")
 
     key = agent_ip
-    print(key, "---------------------------")
     snapshot_dir = get_snapshot_dir(TARGET_IP)
 
     with AGENTS_LOCK:
@@ -685,9 +673,7 @@ def device_discovery():
             "verified_at": datetime.now(timezone.utc).isoformat()
         }
 
-    print(f"   Registered: {key}")
-    print(f"{'='*80}\n")
-
+ 
     return jsonify({
         "ok": True,
         "message": "Agent registered - Device discovery enabled",
