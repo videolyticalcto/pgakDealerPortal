@@ -25,14 +25,11 @@ from urllib.parse import urlparse, urlunparse, quote
 from app.blueprints.api import api_bp
 from app.config import Config
 from app.socket_hub import socket_hub_send_command, _SOCKET_AGENT_CONNS, _SOCKET_AGENT_LOCK
+from app.blueprints.devices.routes import AGENTS, AGENTS_LOCK
 
 logger = logging.getLogger(__name__)
 
-# ── In-memory stores for agents (device_discovery verified) ────────────────
 import os
-
-AGENTS_LOCK = threading.Lock()
-AGENTS = {}
 
 PG_SSLMODE = os.getenv("PG_SSLMODE", "prefer")
 
